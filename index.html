@@ -8,6 +8,14 @@
   <body>
     <div id="app">
       <div id="game-root"></div>
+      <div id="batch-banner">
+        <span id="batch-prefix">FLEET STATUS:</span>
+        <b id="batch-name">ENGAGING ENEMY SWARMS</b>
+      </div>
+      <div id="warning-banner">
+        <div class="warning-title">▲ SYSTEM WARNING ▲</div>
+        <div class="warning-subtitle">CAPITAL WARSHIP INBOUND</div>
+      </div>
       <div id="hud" aria-live="polite">
         <section class="top-left">
           <div class="brand">IBOLT // VALKYRIE STORM</div>
@@ -27,6 +35,8 @@
         <section class="bottom-right">
           <div class="weapon"><span>火炮</span><b id="cannon">Lv.1</b></div>
           <div class="weapon"><span>导弹</span><b id="missile">Lv.1</b></div>
+          <div class="weapon"><span>激光</span><b id="laser">Lv.0</b></div>
+          <div class="weapon"><span>弹幕</span><b id="swarm">Lv.0</b></div>
           <div class="bar-shell special"><span>大招</span><i id="special-bar"></i></div>
         </section>
         <div id="toast">方向键/WASD 移动 · 空格变形 · X 导弹风暴 · P 暂停</div>

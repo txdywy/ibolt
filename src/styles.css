@@ -157,23 +157,114 @@ body {
 }
 
 .mode-chip {
-  pointer-events: none;
+  pointer-events: auto;
+  cursor: pointer;
   height: 34px;
   min-width: 86px;
   color: rgba(239, 250, 255, 0.62);
   font-size: 11px;
   font-weight: 900;
+  transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.mode-chip:hover {
+  border-color: var(--cyan);
+  color: #ffffff;
+  box-shadow: 0 0 15px var(--cyan-soft);
+  transform: translateY(-2px);
 }
 
 .mode-chip.active {
   color: #06111f;
-  border-color: rgba(255, 255, 255, 0.75);
+  border-color: rgba(255, 255, 255, 0.9);
   background: linear-gradient(135deg, var(--cyan), var(--lime));
   text-shadow: none;
+  box-shadow: 0 0 15px rgba(81, 246, 255, 0.4);
 }
 
 .special {
   min-width: 140px;
+}
+
+#batch-banner {
+  position: absolute;
+  top: 92px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(6, 17, 31, 0.76);
+  border: 1px solid rgba(81, 246, 255, 0.38);
+  padding: 5px 15px;
+  box-shadow: 0 0 15px rgba(81, 246, 255, 0.15);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+#batch-prefix {
+  color: rgba(239, 250, 255, 0.52);
+}
+
+#batch-name {
+  color: var(--cyan);
+  text-shadow: 0 0 8px rgba(81, 246, 255, 0.5);
+  text-transform: uppercase;
+}
+
+#warning-banner {
+  position: absolute;
+  top: 25%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 4;
+  pointer-events: none;
+  text-align: center;
+  display: none;
+  flex-direction: column;
+  gap: 6px;
+  background: rgba(255, 10, 40, 0.16);
+  border: 2px solid #ff1a3c;
+  padding: 16px 42px;
+  box-shadow: 
+    0 0 35px rgba(255, 10, 40, 0.4),
+    inset 0 0 25px rgba(255, 10, 40, 0.3);
+  backdrop-filter: blur(8px);
+  animation: alarm-pulse 1s infinite alternate ease-in-out;
+}
+
+#warning-banner.visible {
+  display: flex;
+}
+
+.warning-title {
+  color: #ff3b30;
+  font-size: 26px;
+  font-weight: 950;
+  letter-spacing: 2px;
+  text-shadow: 0 0 15px rgba(255, 10, 40, 0.9);
+}
+
+.warning-subtitle {
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 3px;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+}
+
+@keyframes alarm-pulse {
+  0% {
+    opacity: 0.28;
+    transform: translate(-50%, -50%) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.04);
+  }
 }
 
 #toast {

@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>IBolt Valkyrie Storm</title>
+  </head>
+  <body>
+    <div id="app">
+      <div id="game-root"></div>
+      <div id="hud" aria-live="polite">
+        <section class="top-left">
+          <div class="brand">IBOLT // VALKYRIE STORM</div>
+          <div class="bar-shell"><span>装甲</span><i id="hp-bar"></i></div>
+          <div class="bar-shell shield"><span>护盾</span><i id="shield-bar"></i></div>
+        </section>
+        <section class="top-right">
+          <div class="readout"><span>SCORE</span><b id="score">0</b></div>
+          <div class="readout"><span>WAVE</span><b id="wave">1</b></div>
+          <div class="readout"><span>BOSS</span><b id="boss">--</b></div>
+        </section>
+        <section class="bottom-left">
+          <button class="mode-chip active" id="mode-fighter">FIGHTER</button>
+          <button class="mode-chip" id="mode-gerwalk">GERWALK</button>
+          <button class="mode-chip" id="mode-armor">ARMOR</button>
+        </section>
+        <section class="bottom-right">
+          <div class="weapon"><span>火炮</span><b id="cannon">Lv.1</b></div>
+          <div class="weapon"><span>导弹</span><b id="missile">Lv.1</b></div>
+          <div class="bar-shell special"><span>大招</span><i id="special-bar"></i></div>
+        </section>
+        <div id="toast">方向键/WASD 移动 · 空格变形 · X 导弹风暴 · P 暂停</div>
+        <div id="overlay" class="visible">
+          <div class="title">VALKYRIE<br />STORM</div>
+          <p>骷髅战机已接入雷暴核心。<br />穿越敌阵，吞噬装备，<br />变形突袭，击沉关底巨舰。</p>
+          <button id="start-button">启动出击</button>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

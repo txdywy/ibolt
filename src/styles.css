@@ -1,0 +1,307 @@
+:root {
+  color-scheme: dark;
+  --cyan: #51f6ff;
+  --cyan-soft: rgba(81, 246, 255, 0.2);
+  --amber: #ffcb57;
+  --rose: #ff477e;
+  --lime: #79ff9f;
+  --ink: #06111f;
+  --panel: rgba(5, 15, 29, 0.68);
+  --line: rgba(139, 226, 255, 0.34);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background: #02050c;
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+}
+
+body {
+  user-select: none;
+}
+
+#game-root,
+#hud {
+  position: fixed;
+  inset: 0;
+}
+
+#game-root canvas {
+  display: block;
+}
+
+#hud {
+  pointer-events: none;
+  color: #effaff;
+  text-shadow: 0 0 18px rgba(81, 246, 255, 0.3);
+}
+
+.top-left,
+.top-right,
+.bottom-left,
+.bottom-right {
+  position: absolute;
+  display: flex;
+  gap: 8px;
+  z-index: 2;
+}
+
+.top-left {
+  top: 18px;
+  left: 18px;
+  width: min(360px, calc(100vw - 36px));
+  flex-direction: column;
+}
+
+.top-right {
+  top: 18px;
+  right: 18px;
+}
+
+.bottom-left {
+  bottom: 18px;
+  left: 18px;
+}
+
+.bottom-right {
+  right: 18px;
+  bottom: 18px;
+  align-items: flex-end;
+}
+
+.brand,
+.readout,
+.weapon,
+.mode-chip,
+.bar-shell {
+  border: 1px solid var(--line);
+  background:
+    linear-gradient(135deg, rgba(81, 246, 255, 0.12), rgba(255, 71, 126, 0.08)),
+    var(--panel);
+  box-shadow:
+    inset 0 0 24px rgba(81, 246, 255, 0.06),
+    0 10px 34px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(10px);
+}
+
+.brand {
+  width: fit-content;
+  padding: 8px 10px;
+  color: var(--cyan);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+.bar-shell {
+  position: relative;
+  height: 24px;
+  min-width: 220px;
+  overflow: hidden;
+}
+
+.bar-shell span {
+  position: absolute;
+  left: 10px;
+  top: 4px;
+  z-index: 1;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.bar-shell i {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform-origin: left center;
+  background: linear-gradient(90deg, var(--rose), var(--amber));
+  transition: transform 120ms linear;
+}
+
+.bar-shell.shield i,
+.bar-shell.special i {
+  background: linear-gradient(90deg, #3d8bff, var(--cyan));
+}
+
+.readout,
+.weapon {
+  min-width: 86px;
+  padding: 7px 9px;
+  display: grid;
+  gap: 2px;
+}
+
+.readout span,
+.weapon span {
+  color: rgba(239, 250, 255, 0.72);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.readout b,
+.weapon b {
+  color: #ffffff;
+  font-size: 17px;
+  line-height: 1;
+}
+
+.mode-chip {
+  pointer-events: none;
+  height: 34px;
+  min-width: 86px;
+  color: rgba(239, 250, 255, 0.62);
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.mode-chip.active {
+  color: #06111f;
+  border-color: rgba(255, 255, 255, 0.75);
+  background: linear-gradient(135deg, var(--cyan), var(--lime));
+  text-shadow: none;
+}
+
+.special {
+  min-width: 140px;
+}
+
+#toast {
+  position: absolute;
+  left: 50%;
+  bottom: 20px;
+  transform: translateX(-50%);
+  z-index: 2;
+  padding: 8px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(4, 8, 17, 0.52);
+  color: rgba(239, 250, 255, 0.78);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+#overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: none;
+  place-items: center;
+  padding: 24px;
+  background:
+    radial-gradient(circle at 50% 42%, rgba(81, 246, 255, 0.18), transparent 32%),
+    rgba(1, 4, 10, 0.72);
+  pointer-events: auto;
+}
+
+#overlay.visible {
+  display: grid;
+}
+
+#overlay .title,
+#overlay p {
+  width: min(100%, 620px);
+  max-width: 620px;
+  text-align: center;
+}
+
+.title {
+  width: min(100%, 620px);
+  color: #ffffff;
+  font-size: clamp(40px, 8vw, 92px);
+  font-weight: 950;
+  line-height: 0.92;
+  text-shadow:
+    0 0 14px rgba(81, 246, 255, 0.95),
+    0 0 46px rgba(255, 71, 126, 0.5);
+}
+
+#overlay p {
+  margin: 20px auto 26px;
+  color: rgba(239, 250, 255, 0.86);
+  font-size: 16px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+  word-break: break-all;
+}
+
+#start-button {
+  min-width: 168px;
+  height: 48px;
+  padding: 0 34px;
+  border: 0;
+  background: linear-gradient(135deg, var(--amber), var(--rose));
+  color: #100710;
+  font-size: 15px;
+  font-weight: 950;
+  cursor: pointer;
+  box-shadow: 0 0 30px rgba(255, 71, 126, 0.4);
+}
+
+@media (max-width: 720px) {
+  .top-right {
+    top: auto;
+    right: 12px;
+    bottom: 64px;
+    flex-direction: column;
+  }
+
+  .top-left,
+  .bottom-left,
+  .bottom-right {
+    left: 12px;
+    right: 12px;
+  }
+
+  .top-left {
+    top: 12px;
+    width: auto;
+  }
+
+  .bottom-left {
+    bottom: 12px;
+    right: auto;
+    width: min(320px, calc(100vw - 24px));
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .bottom-right {
+    display: none;
+  }
+
+  #toast {
+    display: none;
+  }
+
+  #overlay p {
+    max-width: 300px;
+    font-size: 15px;
+  }
+
+  #start-button {
+    width: auto;
+    max-width: calc(100vw - 48px);
+  }
+
+  .mode-chip {
+    min-width: 0;
+    width: 100%;
+    padding: 0;
+    font-size: 10px;
+  }
+
+  .title {
+    font-size: clamp(36px, 13vw, 48px);
+  }
+}

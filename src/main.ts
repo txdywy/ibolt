@@ -1475,14 +1475,7 @@ class BattleScene extends Phaser.Scene {
       return true;
     });
 
-    // Cleanup drifting medals
-    this.medalsGroup.children.each((child) => {
-      const m = child as Phaser.Physics.Arcade.Image;
-      if (m.active && m.y > H + 40) {
-        m.disableBody(true, true);
-      }
-      return true;
-    });
+
 
     this.updateHud();
   }
@@ -1697,8 +1690,8 @@ class BattleScene extends Phaser.Scene {
       }
     }
 
-    // Phase 2: Piercing Laser Beam Sub-weapon
-    if (this.playerState.laserLevel > 0) {
+    // Phase 2: Piercing Laser Beam Sub-weapon (only active in Fighter mode)
+    if (this.playerState.mode === "fighter" && this.playerState.laserLevel > 0) {
       const laser = this.lasers.get(this.player.x, this.player.y - 340, "laser-beam") as Phaser.Physics.Arcade.Sprite;
       if (laser) {
         laser.enableBody(true, this.player.x, this.player.y - 340, true, true);
@@ -1713,8 +1706,8 @@ class BattleScene extends Phaser.Scene {
       this.lasers.clear(true, true);
     }
 
-    // Phase 2: Homing Swarm Micro-missiles
-    if (this.playerState.swarmLevel > 0) {
+    // Phase 2: Homing Swarm Micro-missiles (only active in Gerwalk mode)
+    if (this.playerState.mode === "gerwalk" && this.playerState.swarmLevel > 0) {
       this.swarmTimer -= dt;
       if (this.swarmTimer <= 0) {
         this.swarmTimer = Math.max(0.32, 1.0 - this.playerState.swarmLevel * 0.15);
@@ -2706,10 +2699,10 @@ class BattleScene extends Phaser.Scene {
   }
 
   private cleanup() {
-    [this.bullets, this.missiles, this.enemyShots, this.pickups, this.enemies].forEach((group) => {
+    [this.bullets, this.missiles, this.enemyShots, this.pickups, this.enemies, this.medalsGroup].forEach((group) => {
       group.children.each((child) => {
         const obj = child as Phaser.Physics.Arcade.Image;
-        if (obj.active && (obj.y < -220 || obj.y > H + 220 || obj.x < -220 || obj.x > W + 220)) {
+        if (obj.active && (obj.y < -64 || obj.y > H + 64 || obj.x < -64 || obj.x > W + 64)) {
           obj.disableBody(true, true);
         }
         return true;

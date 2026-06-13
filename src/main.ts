@@ -692,6 +692,39 @@ class BootScene extends Phaser.Scene {
     };
     createDreadnought();
 
+    // Goliath Battleship: Giant heavy cruiser with pink/neon outline
+    const createGoliathBattleship = () => {
+      const size = 220;
+      const tex = this.textures.createCanvas("enemy-goliath-battleship", size, size)!;
+      const ctx = tex.getCanvas().getContext("2d")!;
+      const cx = size / 2;
+      const cy = size / 2;
+      ctx.shadowBlur = 24;
+      ctx.shadowColor = "#d946ef";
+      ctx.fillStyle = "#160620";
+      ctx.strokeStyle = "#e879f9";
+      ctx.lineWidth = 5;
+      ctx.lineJoin = "round";
+      ctx.beginPath();
+      ctx.moveTo(cx, cy - 80);
+      ctx.lineTo(cx + 64, cy - 40);
+      ctx.lineTo(cx + 80, cy + 20);
+      ctx.lineTo(cx + 46, cy + 80);
+      ctx.lineTo(cx - 46, cy + 80);
+      ctx.lineTo(cx - 80, cy + 20);
+      ctx.lineTo(cx - 64, cy - 40);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      // Add double cannons
+      ctx.fillStyle = "#e879f9";
+      ctx.fillRect(cx - 24, cy - 90, 8, 30);
+      ctx.fillRect(cx + 16, cy - 90, 8, 30);
+      tex.refresh();
+    };
+    createGoliathBattleship();
+
     // Enemy heavy bomb texture
     const createEnemyBomb = () => {
       const tex = this.textures.createCanvas("enemy-bomb", 48, 48)!;
@@ -1091,6 +1124,41 @@ class BootScene extends Phaser.Scene {
     };
     createShieldBubble();
 
+    // Gold Medal star texture
+    const createMedal = () => {
+      const size = 32;
+      const tex = this.textures.createCanvas("medal", size, size)!;
+      const ctx = tex.getCanvas().getContext("2d")!;
+      const cx = size / 2;
+      const cy = size / 2;
+      ctx.shadowBlur = 8;
+      ctx.shadowColor = "#facc15";
+      ctx.fillStyle = "#eab308";
+      ctx.strokeStyle = "#fef08a";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      const spikes = 5, outerRadius = 11, innerRadius = 5;
+      let rot = (Math.PI / 2) * 3;
+      let x = cx, y = cy;
+      const step = Math.PI / spikes;
+      ctx.moveTo(cx, cy - outerRadius);
+      for (let i = 0; i < spikes; i++) {
+        x = cx + Math.cos(rot) * outerRadius;
+        y = cy + Math.sin(rot) * outerRadius;
+        ctx.lineTo(x, y);
+        rot += step;
+        x = cx + Math.cos(rot) * innerRadius;
+        y = cy + Math.sin(rot) * innerRadius;
+        ctx.lineTo(x, y);
+        rot += step;
+      }
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      tex.refresh();
+    };
+    createMedal();
+
     // Upgraded Pickups with letter overlays for different functions
     const createPickup = () => {
       const size = 64;
@@ -1133,7 +1201,9 @@ class BattleScene extends Phaser.Scene {
   private enemyShields!: Phaser.Physics.Arcade.Group;
   private aegisGroup!: Phaser.Physics.Arcade.Group;
   private laserGraphics!: Phaser.GameObjects.Graphics;
+  private lightningGraphics!: Phaser.GameObjects.Graphics;
   private pickups!: Phaser.Physics.Arcade.Group;
+  private medalsGroup!: Phaser.Physics.Arcade.Group;
   private fx!: Phaser.GameObjects.Particles.ParticleEmitter;
   private thrusterFx!: Phaser.GameObjects.Particles.ParticleEmitter;
   private shieldBubble!: Phaser.GameObjects.Image;
@@ -1185,6 +1255,7 @@ class BattleScene extends Phaser.Scene {
     this.enemyShields = this.physics.add.group({ classType: Phaser.Physics.Arcade.Sprite });
     this.aegisGroup = this.physics.add.group({ classType: Phaser.Physics.Arcade.Sprite });
     this.laserGraphics = this.add.graphics().setDepth(5);
+    this.lightningGraphics = this.add.graphics().setDepth(5);
     this.pickups = this.physics.add.group({ classType: Phaser.Physics.Arcade.Image, maxSize: 24 });
     this.player = this.physics.add.sprite(W / 2, H - 170, "player-fighter").setDepth(8);
     this.player.setCollideWorldBounds(true);
@@ -1218,6 +1289,7 @@ class BattleScene extends Phaser.Scene {
     this.input.keyboard!.on("keydown-X", () => this.special());
     this.input.keyboard!.on("keydown-P", () => this.togglePause());
     this.input.keyboard!.on("keydown-C", () => this.launchNuke());
+    this.input.keyboard!.on("keydown-SPACE", () => this.launchNuke());
     this.physics.add.overlap(this.bullets, this.enemies, this.hitEnemy, undefined, this);
     this.physics.add.overlap(this.missiles, this.enemies, this.hitEnemyWithMissile, undefined, this);
     this.physics.add.overlap(this.player, this.enemies, this.ramPlayer, undefined, this);
@@ -1229,6 +1301,8 @@ class BattleScene extends Phaser.Scene {
     this.physics.add.overlap(this.lasers, this.enemyShields, this.hitEnemyShieldWithLaser, undefined, this);
     this.physics.add.overlap(this.enemyShots, this.aegisGroup, this.hitAegis, undefined, this);
     this.physics.add.overlap(this.bullets, this.enemyShots, this.hitEnemyShot, undefined, this);
+    this.medalsGroup = this.physics.add.group({ classType: Phaser.Physics.Arcade.Image });
+    this.physics.add.overlap(this.player, this.medalsGroup, this.collectMedal, undefined, this);
     this.physics.add.overlap(this.missiles, this.enemyShots, this.hitEnemyShot, undefined, this);
     this.physics.add.overlap(this.lasers, this.enemyShots, this.hitEnemyShotWithLaser, undefined, this);
 
@@ -1258,6 +1332,8 @@ class BattleScene extends Phaser.Scene {
 
     if (this.pausedByOverlay) {
       if (this.thrusterFx.emitting) this.thrusterFx.stop();
+      this.laserGraphics.clear();
+      this.lightningGraphics.clear();
       return;
     }
     if (!this.thrusterFx.emitting) this.thrusterFx.start();
@@ -1324,6 +1400,7 @@ class BattleScene extends Phaser.Scene {
 
     // Draw active warning laser lines and sweeping heavy beams
     this.laserGraphics.clear();
+    this.lightningGraphics.clear();
     this.enemies.children.each((child) => {
       const enemy = child as Phaser.Physics.Arcade.Sprite;
       if (!enemy.active) return true;
@@ -1353,6 +1430,59 @@ class BattleScene extends Phaser.Scene {
     } else {
       hud.warning.classList.remove("visible");
     }
+
+    // Cycle active weapon/missile pickups over time (Raiden style!)
+    this.pickups.children.each((child) => {
+      const p = child as Phaser.Physics.Arcade.Image;
+      if (!p.active) return true;
+      
+      let timer = p.getData("cycleTimer") ?? 2.2;
+      timer -= dt;
+      p.setData("cycleTimer", timer);
+      if (timer <= 0) {
+        p.setData("cycleTimer", 2.2);
+        const kind = p.getData("kind") as PickupKind;
+        let nextKind: PickupKind = kind;
+        
+        if (kind === "cannon" || kind === "laser" || kind === "lightning") {
+          const cycle: PickupKind[] = ["cannon", "laser", "lightning"];
+          const idx = (cycle.indexOf(kind) + 1) % cycle.length;
+          nextKind = cycle[idx];
+        } else if (kind === "missile" || kind === "swarm") {
+          nextKind = kind === "missile" ? "swarm" : "missile";
+        }
+        
+        if (nextKind !== kind) {
+          p.setData("kind", nextKind);
+          const tintMap: Record<string, number> = {
+            cannon: 0xef4444, // Red
+            laser: 0x3b82f6, // Blue
+            lightning: 0xd946ef, // Purple
+            missile: 0xfacc15, // Yellow
+            swarm: 0x8b5cf6 // Violet
+          };
+          p.setTint(tintMap[nextKind] || 0xffffff);
+          
+          this.tweens.add({
+            targets: p,
+            scaleX: 1.35,
+            scaleY: 1.35,
+            duration: 100,
+            yoyo: true
+          });
+        }
+      }
+      return true;
+    });
+
+    // Cleanup drifting medals
+    this.medalsGroup.children.each((child) => {
+      const m = child as Phaser.Physics.Arcade.Image;
+      if (m.active && m.y > H + 40) {
+        m.disableBody(true, true);
+      }
+      return true;
+    });
 
     this.updateHud();
   }
@@ -1429,12 +1559,15 @@ class BattleScene extends Phaser.Scene {
     this.bossHp = 0;
     this.bossTimer = 0;
     this.warningTimer = 0;
+    this.laserGraphics.clear();
+    this.lightningGraphics.clear();
     this.enemies.clear(true, true);
     this.enemyShots.clear(true, true);
     this.bullets.clear(true, true);
     this.missiles.clear(true, true);
     this.lasers.clear(true, true);
     this.pickups.clear(true, true);
+    this.medalsGroup.clear(true, true);
     this.player.setPosition(W / 2, H - 170).setTexture("player-fighter").setAlpha(1);
     this.thrusterFx.setParticleTint(0x51f6ff);
   }
@@ -1460,66 +1593,92 @@ class BattleScene extends Phaser.Scene {
     if (this.fireTimer <= 0) {
       audio.playLaser();
       if (this.playerState.mode === "fighter") {
-        // Fighter: Fast Concentrated lasers + Chain Lightning
-        this.fireTimer = 0.075;
-        const spread = this.playerState.cannonLevel;
-        for (let i = 0; i < spread; i += 1) {
-          const offset = (i - (spread - 1) / 2) * 12;
+        // --- 1. Raiden Blue Focused Laser ---
+        this.fireTimer = 0.065;
+        const cols = 2 + this.playerState.laserLevel * 2;
+        const spacing = 10;
+        for (let i = 0; i < cols; i += 1) {
+          const offset = (i - (cols - 1) / 2) * spacing;
           const bullet = this.bullets.get(this.player.x + offset, this.player.y - 46, "bolt") as Phaser.Physics.Arcade.Image;
           if (!bullet) continue;
           bullet.enableBody(true, this.player.x + offset, this.player.y - 46, true, true);
           bullet.setActive(true).setVisible(true).setDepth(4).setBlendMode(Phaser.BlendModes.ADD);
-          bullet.clearTint();
-          bullet.setScale(1);
+          bullet.setTint(0x3b82f6); // Glowing Blue
+          bullet.setScale(1.2);
           bullet.setRotation(0);
-          bullet.setVelocity(0, -1320);
-          bullet.setData("damage", 12 + this.playerState.cannonLevel * 4);
-        }
-
-        // Chain Lightning sub-weapon
-        if (this.playerState.lightningLevel > 0) {
-          const chainTargets = (this.enemies.getChildren() as Phaser.Physics.Arcade.Sprite[]).filter((e) => e.active && e.y > 0 && Phaser.Math.Distance.Between(this.player.x, this.player.y, e.x, e.y) < 550);
-          if (chainTargets.length > 0 && Math.random() < 0.32) {
-            const target = Phaser.Utils.Array.GetRandom(chainTargets);
-            this.laserGraphics.lineStyle(3.5, 0x60a5fa, 0.95);
-            this.laserGraphics.lineBetween(this.player.x, this.player.y - 30, target.x, target.y);
-            this.damageEnemy(target, 16 * this.playerState.lightningLevel, false);
-
-            const remaining = chainTargets.filter((e) => e !== target && Phaser.Math.Distance.Between(target.x, target.y, e.x, e.y) < 220);
-            if (remaining.length > 0) {
-              const bounceTarget = Phaser.Utils.Array.GetRandom(remaining);
-              this.laserGraphics.lineStyle(2, 0x93c5fd, 0.85);
-              this.laserGraphics.lineBetween(target.x, target.y, bounceTarget.x, bounceTarget.y);
-              this.damageEnemy(bounceTarget, 10 * this.playerState.lightningLevel, false);
-            }
-          }
+          bullet.setVelocity(0, -1500); // Super fast straight line
+          bullet.setData("damage", 10 + this.playerState.laserLevel * 3.5);
         }
       } else if (this.playerState.mode === "gerwalk") {
-        // Gerwalk: Wide Scatter Shotgun
-        this.fireTimer = 0.12;
-        const count = 5 + this.playerState.cannonLevel;
+        // --- 2. Raiden Red Vulcan Spread ---
+        this.fireTimer = 0.10;
+        const count = 3 + this.playerState.cannonLevel * 2;
+        const spreadAngle = 10 + this.playerState.cannonLevel * 3.5;
         for (let i = 0; i < count; i += 1) {
-          const angle = ((i - (count - 1) / 2) * 8 * Math.PI) / 180;
+          const angle = ((i - (count - 1) / 2) * spreadAngle * Math.PI) / (180 * (count - 1 || 1));
           const bullet = this.bullets.get(this.player.x, this.player.y - 46, "bolt") as Phaser.Physics.Arcade.Image;
           if (!bullet) continue;
           bullet.enableBody(true, this.player.x, this.player.y - 46, true, true);
           bullet.setActive(true).setVisible(true).setDepth(4).setBlendMode(Phaser.BlendModes.ADD);
-          bullet.clearTint();
+          bullet.setTint(0xff5555); // Glowing Red
           bullet.setScale(1);
-          bullet.setVelocity(Math.sin(angle) * 1050, -Math.cos(angle) * 1050);
+          bullet.setVelocity(Math.sin(angle) * 1150, -Math.cos(angle) * 1150);
           bullet.setRotation(angle);
-          bullet.setData("damage", 9 + this.playerState.cannonLevel * 3.2);
+          bullet.setData("damage", 12 + this.playerState.cannonLevel * 4);
         }
       } else {
-        // Armor: Heavy Hyper Cannon plasma shells (heavy splash)
-        this.fireTimer = 0.28;
-        const bullet = this.bullets.get(this.player.x, this.player.y - 46, "enemy-shot") as Phaser.Physics.Arcade.Image;
-        if (bullet) {
-          bullet.enableBody(true, this.player.x, this.player.y - 46, true, true);
-          bullet.setActive(true).setVisible(true).setDepth(4).setScale(1.6).setBlendMode(Phaser.BlendModes.ADD).setTint(0x38bdf8);
-          bullet.setVelocity(0, -840);
-          bullet.setRotation(0);
-          bullet.setData({ damage: 60 + this.playerState.cannonLevel * 20, isHyperShell: true });
+        // --- 3. Raiden Purple Curving Plasma Laser ---
+        this.fireTimer = 0.05; // Fast tick rate for plasma beams
+        const maxTargets = Math.min(3, 1 + Math.floor(this.playerState.lightningLevel / 2));
+        const targets = (this.enemies.getChildren() as Phaser.Physics.Arcade.Sprite[]).filter((e) => e.active && e.y > -20 && e.y < H).sort((a, b) => {
+          return Phaser.Math.Distance.Between(this.player.x, this.player.y, a.x, a.y) - Phaser.Math.Distance.Between(this.player.x, this.player.y, b.x, b.y);
+        }).slice(0, maxTargets);
+
+        if (targets.length > 0) {
+          targets.forEach((target) => {
+            const startX = this.player.x;
+            const startY = this.player.y - 30;
+            const endX = target.x;
+            const endY = target.y;
+
+            const points: Phaser.Math.Vector2[] = [];
+            const segments = 10;
+            const waveOffset = Math.sin(this.time.now * 0.05) * 25;
+            for (let i = 0; i <= segments; i++) {
+              const t = i / segments;
+              const lx = Phaser.Math.Linear(startX, endX, t);
+              const ly = Phaser.Math.Linear(startY, endY, t);
+              const wave = Math.sin(t * Math.PI) * waveOffset;
+              
+              const angle = Phaser.Math.Angle.Between(startX, startY, endX, endY) + Math.PI / 2;
+              points.push(new Phaser.Math.Vector2(lx + Math.cos(angle) * wave, ly + Math.sin(angle) * wave));
+            }
+
+            // Outer purple glow
+            this.lightningGraphics.lineStyle(5, 0xd946ef, 0.9);
+            this.lightningGraphics.beginPath();
+            this.lightningGraphics.moveTo(points[0].x, points[0].y);
+            for (let i = 1; i < points.length; i++) {
+              this.lightningGraphics.lineTo(points[i].x, points[i].y);
+            }
+            this.lightningGraphics.stroke();
+
+            // Inner white core
+            this.lightningGraphics.lineStyle(2, 0xffffff, 0.95);
+            this.lightningGraphics.beginPath();
+            this.lightningGraphics.moveTo(points[0].x, points[0].y);
+            for (let i = 1; i < points.length; i++) {
+              this.lightningGraphics.lineTo(points[i].x, points[i].y);
+            }
+            this.lightningGraphics.stroke();
+
+            // Deal continuous tick damage
+            this.damageEnemy(target, 60 * dt * (1 + this.playerState.lightningLevel * 0.5), false);
+            
+            if (Math.random() < 0.25) {
+              this.fx.explode(3, target.x, target.y);
+            }
+          });
         }
       }
     }
@@ -1632,6 +1791,43 @@ class BattleScene extends Phaser.Scene {
         }
         this.spawnTimer = 4.0;
       } else {
+        // 24% chance of Swarm Assault in Level 3, 4, 5 when enemies are low
+        if (this.level >= 3 && Math.random() < 0.24 && this.enemies.countActive(true) < 3) {
+          this.spawnTimer = 4.0; 
+          this.batchSpawnedCount += 4; 
+          const swarmCount = 7 + this.wave * 2;
+          for (let i = 0; i < swarmCount; i++) {
+            const xPos = Phaser.Math.Between(50, W - 50);
+            const enemyKey = Math.random() < 0.6 ? "enemy-drone" : "enemy-scout";
+            const enemy = this.enemies.get(xPos, -40, enemyKey) as Phaser.Physics.Arcade.Sprite;
+            if (enemy) {
+              enemy.setTexture(enemyKey);
+              enemy.enableBody(true, xPos, -40, true, true);
+              enemy.clearTint();
+              enemy.setScale(1);
+              enemy.setActive(true).setVisible(true).setDepth(3);
+              
+              let hp = 35 + this.wave * 6;
+              enemy.setData({
+                kind: Math.random() < 0.6 ? "drone" : "scout",
+                hp: hp,
+                hpMax: hp,
+                tier: 0,
+                shoot: Phaser.Math.FloatBetween(0.2, 0.8),
+                sway: Phaser.Math.FloatBetween(-1.5, 1.5),
+                isDiving: true 
+              });
+              
+              const angle = Phaser.Math.Angle.Between(enemy.x, enemy.y, this.player.x, this.player.y);
+              const diveSpeed = 460 + this.wave * 15;
+              enemy.setVelocity(Math.cos(angle) * diveSpeed, Math.sin(angle) * diveSpeed);
+              enemy.setRotation(angle + Math.PI / 2);
+              enemy.setTint(0xff5555);
+            }
+          }
+          return;
+        }
+
         if (this.batchSpawnedCount < this.maxBatchSpawns) {
           this.spawnTimer = Math.max(0.32, 1.25 - this.wave * 0.05 - this.currentBatch * 0.15);
           this.batchSpawnedCount += 1;
@@ -1661,7 +1857,7 @@ class BattleScene extends Phaser.Scene {
               this.spawnEnemy(roll < 0.5 ? "bomber" : roll < 0.8 ? "frigate" : "mine-carrier");
             } else {
               const roll = Math.random();
-              this.spawnEnemy(roll < 0.4 ? "destroyer" : roll < 0.8 ? "bomber" : "mine-carrier");
+              this.spawnEnemy(roll < 0.35 ? "destroyer" : roll < 0.65 ? "bomber" : roll < 0.85 ? "mine-carrier" : "goliath-battleship");
             }
           } else if (this.level === 4) {
             if (this.currentBatch === 0) {
@@ -1671,7 +1867,7 @@ class BattleScene extends Phaser.Scene {
               this.spawnEnemy(roll < 0.5 ? "vanguard" : roll < 0.8 ? "drone" : "beam-cruiser");
             } else {
               const roll = Math.random();
-              this.spawnEnemy(roll < 0.4 ? "cruiser" : roll < 0.75 ? "dreadnought" : "beam-cruiser");
+              this.spawnEnemy(roll < 0.35 ? "cruiser" : roll < 0.65 ? "dreadnought" : roll < 0.85 ? "beam-cruiser" : "goliath-battleship");
             }
           } else {
             // Level 5
@@ -1684,11 +1880,12 @@ class BattleScene extends Phaser.Scene {
             } else {
               const roll = Math.random();
               this.spawnEnemy(
-                roll < 0.25 ? "dreadnought" :
-                roll < 0.50 ? "cruiser" :
-                roll < 0.70 ? "destroyer" :
-                roll < 0.80 ? "beam-cruiser" :
-                roll < 0.90 ? "mine-carrier" : "shield-projector"
+                roll < 0.20 ? "dreadnought" :
+                roll < 0.40 ? "cruiser" :
+                roll < 0.55 ? "destroyer" :
+                roll < 0.70 ? "beam-cruiser" :
+                roll < 0.80 ? "mine-carrier" :
+                roll < 0.90 ? "shield-projector" : "goliath-battleship"
               );
             }
           }
@@ -1697,7 +1894,7 @@ class BattleScene extends Phaser.Scene {
     }
   }
 
-  private spawnEnemy(kind: "scout" | "frigate" | "destroyer" | "cruiser" | "bomber" | "drone" | "vanguard" | "dreadnought" | "shield-projector" | "beam-cruiser" | "mine-carrier" | "boss") {
+  private spawnEnemy(kind: "scout" | "frigate" | "destroyer" | "cruiser" | "bomber" | "drone" | "vanguard" | "dreadnought" | "shield-projector" | "beam-cruiser" | "mine-carrier" | "boss" | "goliath-battleship") {
     let key = "enemy-scout";
     if (kind === "frigate") key = "enemy-frigate";
     else if (kind === "destroyer") key = "enemy-destroyer";
@@ -1709,6 +1906,7 @@ class BattleScene extends Phaser.Scene {
     else if (kind === "shield-projector") key = "enemy-shield-projector";
     else if (kind === "beam-cruiser") key = "enemy-beam-cruiser";
     else if (kind === "mine-carrier") key = "enemy-mine-carrier";
+    else if (kind === "goliath-battleship") key = "enemy-goliath-battleship";
     else if (kind === "boss") {
       const bossKeys = ["boss-carrier", "boss-nebula", "boss-destroyer", "boss-fortress", "boss-ragnarok"];
       key = bossKeys[this.level - 1] || "boss-carrier";
@@ -1718,6 +1916,7 @@ class BattleScene extends Phaser.Scene {
     const y = kind === "boss" ? -120 : -80;
     const enemy = this.enemies.get(x, y, key) as Phaser.Physics.Arcade.Sprite;
     if (!enemy) return;
+    enemy.setTexture(key);
     enemy.enableBody(true, x, y, true, true);
     enemy.clearTint();
     enemy.setScale(1);
@@ -1787,6 +1986,11 @@ class BattleScene extends Phaser.Scene {
       sizeRadius = 50;
       speedY = Phaser.Math.Between(80, 120) + this.wave * 3;
       isHeavy = true;
+    } else if (kind === "goliath-battleship") {
+      hp = 1400 + this.wave * 150;
+      sizeRadius = 80;
+      speedY = Phaser.Math.Between(40, 70) + this.wave * 1.5;
+      isHeavy = true;
     } else if (kind === "boss") {
       const bossHps = [1800, 3000, 4500, 6000, 9000];
       hp = (bossHps[this.level - 1] || 1800) + this.wave * 300;
@@ -1808,8 +2012,16 @@ class BattleScene extends Phaser.Scene {
       sizeRadius = Math.round(sizeRadius * 1.25);
     }
 
-    enemy.setActive(true).setVisible(true).setDepth(kind === "boss" ? 6 : 3)
-      .setData({ kind, hp, hpMax: hp, tier, shoot: Phaser.Math.FloatBetween(0.4, 1.6), sway: Phaser.Math.FloatBetween(-1.6, 1.6) });
+    // 50% chance to assign a dive-bomb timer to lightweight scouts, drones, and vanguards
+    let diveTimer: number | undefined = undefined;
+    if (kind === "scout" || kind === "drone" || kind === "vanguard") {
+      if (Math.random() < 0.50) {
+        diveTimer = Phaser.Math.FloatBetween(1.0, 3.5);
+      }
+    }
+
+    enemy.setActive(true).setVisible(true).setDepth(kind === "boss" || kind === "goliath-battleship" ? 6 : 3)
+      .setData({ kind, hp, hpMax: hp, tier, shoot: Phaser.Math.FloatBetween(0.4, 1.6), sway: Phaser.Math.FloatBetween(-1.6, 1.6), diveTimer });
     enemy.setVelocity(Phaser.Math.Between(-60, 60), speedY);
     enemy.setAngularVelocity(kind === "scout" || kind === "drone" ? Phaser.Math.Between(-45, 45) : 0);
     enemy.setCircle(sizeRadius, kind === "boss" ? 76 : 0, kind === "boss" ? 22 : 0);
@@ -1840,13 +2052,44 @@ class BattleScene extends Phaser.Scene {
       const enemy = child as Phaser.Physics.Arcade.Sprite;
       if (!enemy.active) return true;
       const kind = enemy.getData("kind") as string;
+
+      // Handle dive bomb charge behavior for light fighters
+      const isDiving = enemy.getData("isDiving") === true;
+      let diveTimer = enemy.getData("diveTimer");
+      if (!isDiving && diveTimer !== undefined) {
+        diveTimer -= dt;
+        enemy.setData("diveTimer", diveTimer);
+        if (diveTimer <= 0) {
+          enemy.setData("isDiving", true);
+          enemy.setTint(0xff3333);
+          audio.playMissile();
+        }
+      }
       
       // Kamikaze drone pursues the player directly, others sway slightly
-      if (kind === "drone") {
+      if (enemy.getData("isDiving") === true) {
+        const angle = Phaser.Math.Angle.Between(enemy.x, enemy.y, this.player.x, this.player.y);
+        const diveSpeed = 380 + this.wave * 15;
+        enemy.setVelocity(Math.cos(angle) * diveSpeed, Math.sin(angle) * diveSpeed);
+        enemy.setRotation(angle + Math.PI / 2);
+      } else if (kind === "drone") {
         const angle = Phaser.Math.Angle.Between(enemy.x, enemy.y, this.player.x, this.player.y);
         const droneSpeed = 260 + this.wave * 12;
         enemy.setVelocity(Math.cos(angle) * droneSpeed, Math.sin(angle) * droneSpeed);
         enemy.setRotation(angle + Math.PI / 2);
+      } else if (kind === "goliath-battleship") {
+        const hp = enemy.getData("hp");
+        const hpMax = enemy.getData("hpMax");
+        const isRaged = hp < hpMax * 0.55;
+        if (isRaged) {
+          enemy.setTint(0xff5555);
+          enemy.setVelocityY(220 + this.wave * 5);
+          // Raged battleships fire significantly faster!
+          enemy.setData("shoot", enemy.getData("shoot") - dt * 1.25);
+        } else {
+          enemy.setVelocityY(50 + this.wave * 1.5);
+        }
+        enemy.x += Math.sin(this.time.now * 0.0018 + enemy.getData("sway")) * 1.2;
       } else if (kind === "beam-cruiser") {
         const state = enemy.getData("beamState") || "idle";
         if (state === "targeting" || state === "firing") {
@@ -1866,6 +2109,28 @@ class BattleScene extends Phaser.Scene {
         const tier = enemy.getData("tier") as number;
         let shootDelay = 1.0;
         let isHoming = (tier === 2);
+
+        // Goliath Battleship Weapon Attacks
+        if (kind === "goliath-battleship") {
+          shootDelay = 1.15;
+          const roll = Math.random();
+          if (roll < 0.35) {
+            // Massive 9-bullet shotgun blast
+            const count = 9;
+            for (let i = 0; i < count; i++) {
+              const angle = Math.PI / 2 + ((i - (count - 1) / 2) * 0.22);
+              this.enemyFireAngle(enemy.x, enemy.y + 60, angle, 300);
+            }
+          } else if (roll < 0.70) {
+            // Launch 2 toxic nukes!
+            this.enemyFireNuke(enemy.x - 40, enemy.y + 50);
+            this.enemyFireNuke(enemy.x + 40, enemy.y + 50);
+          } else {
+            // Deploy space mines behind it
+            this.enemyDropMine(enemy.x - 50, enemy.y + 40);
+            this.enemyDropMine(enemy.x + 50, enemy.y + 40);
+          }
+        }
 
         // Heavy ships have a chance to fire Toxic Nuclear Missiles
         const heavyNukeRoll = (kind === "dreadnought" || kind === "cruiser" || kind === "destroyer" || kind === "boss") && Math.random() < 0.16;
@@ -2296,6 +2561,16 @@ class BattleScene extends Phaser.Scene {
     this.cameras.main.shake(kind === "boss" ? 900 : 160, kind === "boss" ? 0.026 : 0.005);
     this.score += kind === "boss" ? 10000 : kind === "frigate" ? 840 : 180;
     this.playerState.special = clamp(this.playerState.special + (kind === "boss" ? 45 : 7), 0, 100);
+    
+    // Spawn spinning gold medal (50% chance for non-boss enemies)
+    if (Math.random() < 0.50 && kind !== "boss") {
+      const medal = this.medalsGroup.get(enemy.x, enemy.y, "medal") as Phaser.Physics.Arcade.Sprite;
+      if (medal) {
+        medal.enableBody(true, enemy.x, enemy.y, true, true);
+        medal.setActive(true).setVisible(true).setDepth(5).setVelocity(0, 160);
+      }
+    }
+
     if (Math.random() < (kind === "boss" ? 1 : 0.26)) this.dropPickup(enemy.x, enemy.y, kind === "boss" ? "core" : undefined);
     if (kind === "boss") {
       this.wave += 1;
@@ -2321,15 +2596,50 @@ class BattleScene extends Phaser.Scene {
     pickup.setTint(kind === "cannon" ? 0x51f6ff : kind === "missile" ? 0xffcb57 : kind === "repair" ? 0x79ff9f : kind === "laser" ? 0xef4444 : kind === "swarm" ? 0xa855f7 : kind === "nuke" ? 0xfacc15 : kind === "lightning" ? 0x60a5fa : kind === "aegis" ? 0x06b6d4 : 0xff477e);
   }
 
+  private collectMedal: Phaser.Types.Physics.Arcade.ArcadePhysicsCallback = (_playerObj, medalObj) => {
+    const medal = medalObj as Phaser.Physics.Arcade.Image;
+    audio.playPickup();
+    this.score += 500;
+    
+    const text = this.add.text(medal.x, medal.y, "+500", {
+      fontFamily: "Outfit, sans-serif",
+      fontSize: "20px",
+      color: "#facc15",
+      stroke: "#000000",
+      strokeThickness: 3
+    }).setDepth(10);
+    this.tweens.add({
+      targets: text,
+      y: medal.y - 60,
+      alpha: 0,
+      duration: 800,
+      onComplete: () => text.destroy()
+    });
+
+    medal.disableBody(true, true);
+  };
+
   private collectPickup: Phaser.Types.Physics.Arcade.ArcadePhysicsCallback = (_playerObj, pickupObj) => {
     const pickup = pickupObj as Phaser.Physics.Arcade.Image;
     const kind = pickup.getData("kind") as PickupKind;
     audio.playPickup();
-    if (kind === "cannon") this.playerState.cannonLevel = clamp(this.playerState.cannonLevel + 1, 1, 5);
+    
+    // Raiden style: Collecting Red/Blue/Purple weapons changes active mode and upgrades it!
+    if (kind === "cannon") {
+      this.changeMode("gerwalk");
+      this.playerState.cannonLevel = clamp(this.playerState.cannonLevel + 1, 1, 5);
+    }
+    if (kind === "laser") {
+      this.changeMode("fighter");
+      this.playerState.laserLevel = clamp(this.playerState.laserLevel + 1, 1, 5);
+    }
+    if (kind === "lightning") {
+      this.changeMode("armor");
+      this.playerState.lightningLevel = clamp(this.playerState.lightningLevel + 1, 1, 5);
+    }
+    
     if (kind === "missile") this.playerState.missileLevel = clamp(this.playerState.missileLevel + 1, 1, 5);
-    if (kind === "laser") this.playerState.laserLevel = clamp(this.playerState.laserLevel + 1, 0, 5);
     if (kind === "swarm") this.playerState.swarmLevel = clamp(this.playerState.swarmLevel + 1, 0, 5);
-    if (kind === "lightning") this.playerState.lightningLevel = clamp(this.playerState.lightningLevel + 1, 0, 5);
     if (kind === "aegis") this.playerState.aegisLevel = clamp(this.playerState.aegisLevel + 1, 0, 5);
     if (kind === "nuke") this.playerState.nukeStock = clamp(this.playerState.nukeStock + 1, 0, 3);
     if (kind === "repair") this.playerState.hp = clamp(this.playerState.hp + 32, 0, this.playerState.hpMax);

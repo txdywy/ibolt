@@ -417,6 +417,295 @@ class BootScene extends Phaser.Scene {
     };
     createBoss();
 
+    // 4b. Boss Nebula (Level 2 Boss)
+    const createBossNebula = () => {
+      const w = 320;
+      const h = 220;
+      const tex = this.textures.createCanvas("boss-nebula", w, h)!;
+      const ctx = tex.getCanvas().getContext("2d")!;
+      ctx.shadowBlur = 20;
+      ctx.shadowColor = "#a855f7";
+      ctx.fillStyle = "#110724";
+      ctx.strokeStyle = "#c084fc";
+      ctx.lineWidth = 5;
+      ctx.lineJoin = "round";
+
+      ctx.beginPath();
+      ctx.moveTo(w / 2, 20);
+      ctx.lineTo(w / 2 + 40, 50);
+      ctx.lineTo(w - 20, 50);
+      ctx.lineTo(w - 40, 160);
+      ctx.lineTo(w / 2 + 80, 190);
+      ctx.lineTo(w / 2 + 20, 170);
+      ctx.lineTo(w / 2 - 20, 170);
+      ctx.lineTo(w / 2 - 80, 190);
+      ctx.lineTo(20, 160);
+      ctx.lineTo(40, 50);
+      ctx.lineTo(w / 2 - 40, 50);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      // Cyan Cores
+      ctx.shadowColor = "#06b6d4";
+      ctx.fillStyle = "#22d3ee";
+      ctx.beginPath();
+      ctx.arc(w / 2 - 60, 100, 12, 0, Math.PI * 2);
+      ctx.arc(w / 2 + 60, 100, 12, 0, Math.PI * 2);
+      ctx.fill();
+      tex.refresh();
+    };
+    createBossNebula();
+
+    // 4c. Boss Destroyer (Level 3 Boss)
+    const createBossDestroyer = () => {
+      const w = 320;
+      const h = 240;
+      const tex = this.textures.createCanvas("boss-destroyer", w, h)!;
+      const ctx = tex.getCanvas().getContext("2d")!;
+      ctx.shadowBlur = 22;
+      ctx.shadowColor = "#ea580c";
+      ctx.fillStyle = "#200d02";
+      ctx.strokeStyle = "#f97316";
+      ctx.lineWidth = 5;
+      ctx.lineJoin = "round";
+
+      ctx.beginPath();
+      ctx.moveTo(w / 2, 40);
+      ctx.lineTo(w - 40, 20);
+      ctx.lineTo(w - 10, 110);
+      ctx.lineTo(w - 50, 210);
+      ctx.lineTo(w / 2 + 60, 170);
+      ctx.lineTo(w / 2, 220);
+      ctx.lineTo(w / 2 - 60, 170);
+      ctx.lineTo(50, 210);
+      ctx.lineTo(10, 110);
+      ctx.lineTo(40, 20);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      // Rocket launcher bay lines
+      ctx.shadowBlur = 10;
+      ctx.strokeStyle = "#ffcb57";
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(80, 80);
+      ctx.lineTo(120, 80);
+      ctx.moveTo(200, 80);
+      ctx.lineTo(240, 80);
+      ctx.stroke();
+      tex.refresh();
+    };
+    createBossDestroyer();
+
+    // 4d. Boss Fortress (Level 4 Boss)
+    const createBossFortress = () => {
+      const w = 320;
+      const h = 240;
+      const tex = this.textures.createCanvas("boss-fortress", w, h)!;
+      const ctx = tex.getCanvas().getContext("2d")!;
+      ctx.shadowBlur = 24;
+      ctx.shadowColor = "#22c55e";
+      ctx.fillStyle = "#051e0e";
+      ctx.strokeStyle = "#4ade80";
+      ctx.lineWidth = 5;
+      ctx.lineJoin = "round";
+
+      ctx.beginPath();
+      ctx.moveTo(w / 2 - 80, 20);
+      ctx.lineTo(w / 2 + 80, 20);
+      ctx.lineTo(w - 20, 80);
+      ctx.lineTo(w - 20, 180);
+      ctx.lineTo(w / 2 + 100, 220);
+      ctx.lineTo(w / 2 - 100, 220);
+      ctx.lineTo(20, 180);
+      ctx.lineTo(20, 80);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      // Hex green shields
+      ctx.shadowBlur = 12;
+      ctx.strokeStyle = "#86efac";
+      ctx.lineWidth = 2.5;
+      ctx.strokeRect(w / 2 - 40, 60, 80, 60);
+      tex.refresh();
+    };
+    createBossFortress();
+
+    // 4e. Boss Ragnarok (Level 5 Boss)
+    const createBossRagnarok = () => {
+      const w = 320;
+      const h = 260;
+      const tex = this.textures.createCanvas("boss-ragnarok", w, h)!;
+      const ctx = tex.getCanvas().getContext("2d")!;
+      ctx.shadowBlur = 28;
+      ctx.shadowColor = "#eab308";
+      ctx.fillStyle = "#1e1602";
+      ctx.strokeStyle = "#facc15";
+      ctx.lineWidth = 5.5;
+      ctx.lineJoin = "round";
+
+      // Sharp golden geometry spikes
+      ctx.beginPath();
+      ctx.moveTo(w / 2, 10);
+      ctx.lineTo(w / 2 + 50, 70);
+      ctx.lineTo(w - 10, 70);
+      ctx.lineTo(w / 2 + 90, 130);
+      ctx.lineTo(w - 30, 200);
+      ctx.lineTo(w / 2 + 60, 200);
+      ctx.lineTo(w / 2, 250);
+      ctx.lineTo(w / 2 - 60, 200);
+      ctx.lineTo(30, 200);
+      ctx.lineTo(w / 2 - 90, 130);
+      ctx.lineTo(10, 70);
+      ctx.lineTo(w / 2 - 50, 70);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      // Singularity Core
+      ctx.shadowBlur = 20;
+      ctx.shadowColor = "#ffffff";
+      ctx.fillStyle = "#ffffff";
+      ctx.beginPath();
+      ctx.arc(w / 2, 130, 24, 0, Math.PI * 2);
+      ctx.fill();
+      tex.refresh();
+    };
+    createBossRagnarok();
+
+    // 4f. New Enemies
+    // Bomber: Heavy green octa ship
+    const createBomber = () => {
+      const size = 144;
+      const tex = this.textures.createCanvas("enemy-bomber", size, size)!;
+      const ctx = tex.getCanvas().getContext("2d")!;
+      const cx = size / 2;
+      const cy = size / 2;
+      ctx.shadowBlur = 15;
+      ctx.shadowColor = "#10b981";
+      ctx.fillStyle = "#041a12";
+      ctx.strokeStyle = "#34d399";
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy - 36);
+      ctx.lineTo(cx + 42, cy - 18);
+      ctx.lineTo(cx + 42, cy + 18);
+      ctx.lineTo(cx + 18, cy + 36);
+      ctx.lineTo(cx - 18, cy + 36);
+      ctx.lineTo(cx - 42, cy + 18);
+      ctx.lineTo(cx - 42, cy - 18);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      tex.refresh();
+    };
+    createBomber();
+
+    // Drone: Kamikaze Neon red/yellow triangle
+    const createDrone = () => {
+      const size = 64;
+      const tex = this.textures.createCanvas("enemy-drone", size, size)!;
+      const ctx = tex.getCanvas().getContext("2d")!;
+      const cx = size / 2;
+      const cy = size / 2;
+      ctx.shadowBlur = 10;
+      ctx.shadowColor = "#f43f5e";
+      ctx.fillStyle = "#27050b";
+      ctx.strokeStyle = "#fb7185";
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy + 20);
+      ctx.lineTo(cx + 18, cy - 20);
+      ctx.lineTo(cx - 18, cy - 20);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      tex.refresh();
+    };
+    createDrone();
+
+    // Vanguard: Shielded front Cobalt blue ship
+    const createVanguard = () => {
+      const size = 112;
+      const tex = this.textures.createCanvas("enemy-vanguard", size, size)!;
+      const ctx = tex.getCanvas().getContext("2d")!;
+      const cx = size / 2;
+      const cy = size / 2;
+      ctx.shadowBlur = 14;
+      ctx.shadowColor = "#3b82f6";
+      ctx.fillStyle = "#051024";
+      ctx.strokeStyle = "#60a5fa";
+      ctx.lineWidth = 3.5;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy - 30);
+      ctx.lineTo(cx + 36, cy - 10);
+      ctx.lineTo(cx + 24, cy + 24);
+      ctx.lineTo(cx - 24, cy + 24);
+      ctx.lineTo(cx - 36, cy - 10);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      // Shield plate line
+      ctx.strokeStyle = "#93c5fd";
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.moveTo(cx - 30, cy - 8);
+      ctx.lineTo(cx + 30, cy - 8);
+      ctx.stroke();
+      tex.refresh();
+    };
+    createVanguard();
+
+    // Dreadnought: Massive orange/red battlecruiser
+    const createDreadnought = () => {
+      const size = 176;
+      const tex = this.textures.createCanvas("enemy-dreadnought", size, size)!;
+      const ctx = tex.getCanvas().getContext("2d")!;
+      const cx = size / 2;
+      const cy = size / 2;
+      ctx.shadowBlur = 18;
+      ctx.shadowColor = "#f97316";
+      ctx.fillStyle = "#1f0c02";
+      ctx.strokeStyle = "#fdba74";
+      ctx.lineWidth = 4;
+      ctx.lineJoin = "round";
+      ctx.beginPath();
+      ctx.moveTo(cx, cy - 50);
+      ctx.lineTo(cx + 46, cy - 24);
+      ctx.lineTo(cx + 64, cy + 20);
+      ctx.lineTo(cx + 34, cy + 50);
+      ctx.lineTo(cx - 34, cy + 50);
+      ctx.lineTo(cx - 64, cy + 20);
+      ctx.lineTo(cx - 46, cy - 24);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      tex.refresh();
+    };
+    createDreadnought();
+
+    // Enemy heavy bomb texture
+    const createEnemyBomb = () => {
+      const tex = this.textures.createCanvas("enemy-bomb", 48, 48)!;
+      const ctx = tex.getCanvas().getContext("2d")!;
+      const rad = ctx.createRadialGradient(24, 24, 2, 24, 24, 24);
+      rad.addColorStop(0, "#ffffff");
+      rad.addColorStop(0.3, "#f97316");
+      rad.addColorStop(1, "rgba(249, 115, 22, 0)");
+      ctx.fillStyle = rad;
+      ctx.shadowBlur = 15;
+      ctx.shadowColor = "#f97316";
+      ctx.beginPath();
+      ctx.arc(24, 24, 24, 0, Math.PI * 2);
+      ctx.fill();
+      tex.refresh();
+    };
+    createEnemyBomb();
+
     // 5. Upgrade Projectiles & Particles
     const createBolt = () => {
       const tex = this.textures.createCanvas("bolt", 16, 48)!;
@@ -582,6 +871,7 @@ class BattleScene extends Phaser.Scene {
   };
   private score = 0;
   private wave = 1;
+  private level = 1;
   private currentBatch = 0; // 0: Scout Swarm, 1: Flanking Fleet, 2: Heavy Guard, 3: Boss Assault
   private batchSpawnedCount = 0;
   private maxBatchSpawns = 10;
@@ -662,8 +952,15 @@ class BattleScene extends Phaser.Scene {
 
   update(_: number, deltaMs: number) {
     const dt = deltaMs / 1000;
-    this.starfield.tilePositionY -= 460 * dt;
-    this.nebula.tilePositionY -= 80 * dt;
+    const scrollSpeeds = [460, 520, 600, 700, 800];
+    const speed = scrollSpeeds[this.level - 1] || 460;
+    this.starfield.tilePositionY -= speed * dt;
+    this.nebula.tilePositionY -= (speed * 0.18) * dt;
+
+    const levelColors = [0x1569b4, 0xa855f7, 0xea580c, 0x22c55e, 0xeab308];
+    const currentColor = levelColors[this.level - 1] || 0x1569b4;
+    this.nebula.setTint(currentColor);
+
     if (this.pausedByOverlay) {
       if (this.thrusterFx.emitting) this.thrusterFx.stop();
       return;
@@ -722,13 +1019,13 @@ class BattleScene extends Phaser.Scene {
     const nebulaCanvas = nebulaTexture!.getCanvas();
     const nebulaCtx = nebulaCanvas.getContext("2d")!;
     const blue = nebulaCtx.createRadialGradient(260, 360, 20, 260, 360, 390);
-    blue.addColorStop(0, "rgba(21, 105, 180, 0.34)");
-    blue.addColorStop(1, "rgba(21, 105, 180, 0)");
+    blue.addColorStop(0, "rgba(255, 255, 255, 0.34)");
+    blue.addColorStop(1, "rgba(255, 255, 255, 0)");
     nebulaCtx.fillStyle = blue;
     nebulaCtx.fillRect(0, 0, W, H);
     const rose = nebulaCtx.createRadialGradient(760, 860, 10, 760, 860, 430);
-    rose.addColorStop(0, "rgba(255, 71, 126, 0.22)");
-    rose.addColorStop(1, "rgba(255, 71, 126, 0)");
+    rose.addColorStop(0, "rgba(255, 255, 255, 0.22)");
+    rose.addColorStop(1, "rgba(255, 255, 255, 0)");
     nebulaCtx.fillStyle = rose;
     nebulaCtx.fillRect(0, 0, W, H);
     nebulaTexture!.refresh();
@@ -760,6 +1057,7 @@ class BattleScene extends Phaser.Scene {
     };
     this.score = 0;
     this.wave = 1;
+    this.level = 1;
     this.currentBatch = 0;
     this.batchSpawnedCount = 0;
     this.maxBatchSpawns = 10;
@@ -921,8 +1219,14 @@ class BattleScene extends Phaser.Scene {
         this.maxBatchSpawns = 8 + this.currentBatch * 4 + this.wave * 2;
         this.spawnTimer = 2.5; // Brief transition pause
       } else if (this.bossHp <= 0) {
-        // Wave fully cleared! Progress to next Wave
-        this.wave += 1;
+        // Wave/Level fully cleared! Progress to next Level/Wave
+        if (this.level < 5) {
+          this.level += 1;
+        } else {
+          // Loop back to Level 1 but increase wave multiplier
+          this.level = 1;
+          this.wave += 1;
+        }
         this.currentBatch = 0;
         this.batchSpawnedCount = 0;
         this.maxBatchSpawns = 10 + this.wave * 2;
@@ -941,25 +1245,72 @@ class BattleScene extends Phaser.Scene {
         this.spawnTimer = 4.0;
       } else {
         if (this.batchSpawnedCount < this.maxBatchSpawns) {
-          this.spawnTimer = Math.max(0.35, 1.25 - this.wave * 0.05 - this.currentBatch * 0.15);
+          this.spawnTimer = Math.max(0.32, 1.25 - this.wave * 0.05 - this.currentBatch * 0.15);
           this.batchSpawnedCount += 1;
 
-          // Spawning based on batch type
-          if (this.currentBatch === 0) {
-            this.spawnEnemy("scout");
-          } else if (this.currentBatch === 1) {
-            this.spawnEnemy(Math.random() < 0.65 ? "frigate" : "scout");
+          // Level-based spawns configuration
+          if (this.level === 1) {
+            if (this.currentBatch === 0) {
+              this.spawnEnemy("scout");
+            } else if (this.currentBatch === 1) {
+              this.spawnEnemy(Math.random() < 0.65 ? "scout" : "frigate");
+            } else {
+              this.spawnEnemy(Math.random() < 0.5 ? "frigate" : "destroyer");
+            }
+          } else if (this.level === 2) {
+            if (this.currentBatch === 0) {
+              this.spawnEnemy("drone");
+            } else if (this.currentBatch === 1) {
+              this.spawnEnemy(Math.random() < 0.6 ? "drone" : "scout");
+            } else {
+              this.spawnEnemy(Math.random() < 0.5 ? "frigate" : "cruiser");
+            }
+          } else if (this.level === 3) {
+            if (this.currentBatch === 0) {
+              this.spawnEnemy("bomber");
+            } else if (this.currentBatch === 1) {
+              this.spawnEnemy(Math.random() < 0.6 ? "bomber" : "frigate");
+            } else {
+              this.spawnEnemy(Math.random() < 0.5 ? "destroyer" : "bomber");
+            }
+          } else if (this.level === 4) {
+            if (this.currentBatch === 0) {
+              this.spawnEnemy("vanguard");
+            } else if (this.currentBatch === 1) {
+              this.spawnEnemy(Math.random() < 0.6 ? "vanguard" : "drone");
+            } else {
+              this.spawnEnemy(Math.random() < 0.5 ? "cruiser" : "dreadnought");
+            }
           } else {
-            const roll = Math.random();
-            this.spawnEnemy(roll < 0.4 ? "destroyer" : roll < 0.8 ? "cruiser" : "frigate");
+            // Level 5
+            if (this.currentBatch === 0) {
+              this.spawnEnemy(Math.random() < 0.5 ? "dreadnought" : "drone");
+            } else if (this.currentBatch === 1) {
+              this.spawnEnemy(Math.random() < 0.5 ? "vanguard" : "bomber");
+            } else {
+              const roll = Math.random();
+              this.spawnEnemy(roll < 0.4 ? "dreadnought" : roll < 0.7 ? "cruiser" : "destroyer");
+            }
           }
         }
       }
     }
   }
 
-  private spawnEnemy(kind: "scout" | "frigate" | "destroyer" | "cruiser" | "boss") {
-    const key = kind === "scout" ? "enemy-scout" : kind === "frigate" ? "enemy-frigate" : kind === "destroyer" ? "enemy-destroyer" : kind === "cruiser" ? "enemy-cruiser" : "boss-carrier";
+  private spawnEnemy(kind: "scout" | "frigate" | "destroyer" | "cruiser" | "bomber" | "drone" | "vanguard" | "dreadnought" | "boss") {
+    let key = "enemy-scout";
+    if (kind === "frigate") key = "enemy-frigate";
+    else if (kind === "destroyer") key = "enemy-destroyer";
+    else if (kind === "cruiser") key = "enemy-cruiser";
+    else if (kind === "bomber") key = "enemy-bomber";
+    else if (kind === "drone") key = "enemy-drone";
+    else if (kind === "vanguard") key = "enemy-vanguard";
+    else if (kind === "dreadnought") key = "enemy-dreadnought";
+    else if (kind === "boss") {
+      const bossKeys = ["boss-carrier", "boss-nebula", "boss-destroyer", "boss-fortress", "boss-ragnarok"];
+      key = bossKeys[this.level - 1] || "boss-carrier";
+    }
+
     const x = Phaser.Math.Between(100, W - 100);
     const y = kind === "boss" ? -120 : -80;
     const enemy = this.enemies.get(x, y, key) as Phaser.Physics.Arcade.Sprite;
@@ -1000,8 +1351,27 @@ class BattleScene extends Phaser.Scene {
       sizeRadius = 64;
       speedY = Phaser.Math.Between(100, 150) + this.wave * 4;
       isHeavy = true;
+    } else if (kind === "bomber") {
+      hp = 360 + this.wave * 40;
+      sizeRadius = 48;
+      speedY = Phaser.Math.Between(70, 110) + this.wave * 3;
+      isHeavy = true;
+    } else if (kind === "drone") {
+      hp = 22 + this.wave * 4;
+      sizeRadius = 18;
+      speedY = Phaser.Math.Between(260, 360) + this.wave * 8;
+    } else if (kind === "vanguard") {
+      hp = 240 + this.wave * 25;
+      sizeRadius = 32;
+      speedY = Phaser.Math.Between(110, 160) + this.wave * 4;
+    } else if (kind === "dreadnought") {
+      hp = 750 + this.wave * 90;
+      sizeRadius = 60;
+      speedY = Phaser.Math.Between(60, 100) + this.wave * 2;
+      isHeavy = true;
     } else if (kind === "boss") {
-      hp = 1800 + this.wave * 220;
+      const bossHps = [1800, 3000, 4500, 6000, 9000];
+      hp = (bossHps[this.level - 1] || 1800) + this.wave * 300;
       sizeRadius = 84;
       speedY = 46;
       isHeavy = true;
@@ -1023,7 +1393,7 @@ class BattleScene extends Phaser.Scene {
     enemy.setActive(true).setVisible(true).setDepth(kind === "boss" ? 6 : 3)
       .setData({ kind, hp, hpMax: hp, tier, shoot: Phaser.Math.FloatBetween(0.4, 1.6), sway: Phaser.Math.FloatBetween(-1.6, 1.6) });
     enemy.setVelocity(Phaser.Math.Between(-60, 60), speedY);
-    enemy.setAngularVelocity(kind === "scout" ? Phaser.Math.Between(-45, 45) : 0);
+    enemy.setAngularVelocity(kind === "scout" || kind === "drone" ? Phaser.Math.Between(-45, 45) : 0);
     enemy.setCircle(sizeRadius, kind === "boss" ? 76 : 0, kind === "boss" ? 22 : 0);
 
     if (isHeavy || tier > 0) {
@@ -1040,8 +1410,17 @@ class BattleScene extends Phaser.Scene {
       const enemy = child as Phaser.Physics.Arcade.Sprite;
       if (!enemy.active) return true;
       const kind = enemy.getData("kind") as string;
-      enemy.x += Math.sin(this.time.now * 0.0018 + enemy.getData("sway")) * (kind === "boss" ? 0.9 : 1.8);
-      if (kind === "boss" && enemy.y > 170) enemy.setVelocityY(8);
+      
+      // Kamikaze drone pursues the player directly, others sway slightly
+      if (kind === "drone") {
+        const angle = Phaser.Math.Angle.Between(enemy.x, enemy.y, this.player.x, this.player.y);
+        const droneSpeed = 260 + this.wave * 12;
+        enemy.setVelocity(Math.cos(angle) * droneSpeed, Math.sin(angle) * droneSpeed);
+        enemy.setRotation(angle + Math.PI / 2);
+      } else {
+        enemy.x += Math.sin(this.time.now * 0.0018 + enemy.getData("sway")) * (kind === "boss" ? 0.9 : 1.8);
+        if (kind === "boss" && enemy.y > 170) enemy.setVelocityY(8);
+      }
       
       const shoot = enemy.getData("shoot") - dt;
       enemy.setData("shoot", shoot);
@@ -1051,9 +1430,42 @@ class BattleScene extends Phaser.Scene {
         let isHoming = (tier === 2);
 
         if (kind === "boss") {
-          shootDelay = 0.22;
-          const lanes = [-44, 0, 44];
-          lanes.forEach((lane) => this.enemyFire(enemy.x + lane, enemy.y + 36, 240));
+          if (this.level === 1) {
+            shootDelay = 0.22;
+            const lanes = [-44, 0, 44];
+            lanes.forEach((lane) => this.enemyFire(enemy.x + lane, enemy.y + 36, 240));
+          } else if (this.level === 2) {
+            shootDelay = 0.48;
+            const count = 12;
+            for (let i = 0; i < count; i++) {
+              const angle = (i * Math.PI * 2) / count;
+              this.enemyFireAngle(enemy.x, enemy.y + 40, angle, 260);
+            }
+          } else if (this.level === 3) {
+            shootDelay = 0.8;
+            this.enemyFire(enemy.x - 60, enemy.y + 40, 280, true);
+            this.enemyFire(enemy.x + 60, enemy.y + 40, 280, true);
+          } else if (this.level === 4) {
+            shootDelay = 0.16;
+            const step = (this.time.now / 120) % (Math.PI * 2);
+            this.enemyFireAngle(enemy.x, enemy.y + 50, step, 280);
+            this.enemyFireAngle(enemy.x, enemy.y + 50, step + Math.PI / 2, 280);
+            this.enemyFireAngle(enemy.x, enemy.y + 50, step + Math.PI, 280);
+            this.enemyFireAngle(enemy.x, enemy.y + 50, step - Math.PI / 2, 280);
+          } else {
+            // Level 5 Ultimate Boss
+            shootDelay = 0.28;
+            const rand = Math.random();
+            if (rand < 0.45) {
+              for (let i = 0; i < 16; i++) {
+                const angle = (i * Math.PI * 2) / 16;
+                this.enemyFireAngle(enemy.x, enemy.y + 60, angle, 300);
+              }
+            } else {
+              this.enemyFire(enemy.x - 30, enemy.y + 60, 350, true);
+              this.enemyFire(enemy.x + 30, enemy.y + 60, 350, true);
+            }
+          }
         } else if (kind === "destroyer") {
           shootDelay = tier === 2 ? 0.75 : tier === 1 ? 0.95 : 1.15;
           this.enemyFire(enemy.x - 30, enemy.y + 30, 260, isHoming);
@@ -1073,7 +1485,31 @@ class BattleScene extends Phaser.Scene {
             this.enemyFire(enemy.x - 20, enemy.y + 24, 290, isHoming);
             this.enemyFire(enemy.x + 20, enemy.y + 24, 290, isHoming);
           }
+        } else if (kind === "bomber") {
+          shootDelay = tier === 2 ? 1.2 : tier === 1 ? 1.5 : 1.8;
+          this.enemyDropBomb(enemy.x, enemy.y + 32);
+        } else if (kind === "drone") {
+          // Kamikaze drones do not shoot standard bullets, they just pursue and self-destruct on contact.
+          shootDelay = 999.0;
+        } else if (kind === "vanguard") {
+          shootDelay = tier === 2 ? 0.7 : tier === 1 ? 0.9 : 1.1;
+          this.enemyFire(enemy.x, enemy.y + 24, 330, isHoming);
+          this.time.delayedCall(160, () => {
+            if (enemy.active) this.enemyFire(enemy.x, enemy.y + 24, 330, isHoming);
+          });
+          this.time.delayedCall(320, () => {
+            if (enemy.active) this.enemyFire(enemy.x, enemy.y + 24, 330, isHoming);
+          });
+        } else if (kind === "dreadnought") {
+          shootDelay = tier === 2 ? 0.9 : tier === 1 ? 1.2 : 1.5;
+          const count = 10;
+          const startAngle = (this.time.now / 150) % (Math.PI * 2);
+          for (let i = 0; i < count; i++) {
+            const angle = startAngle + (i * Math.PI * 2) / count;
+            this.enemyFireAngle(enemy.x, enemy.y + 45, angle, 250);
+          }
         } else {
+          // scout
           shootDelay = tier === 2 ? 0.8 : tier === 1 ? 1.1 : 1.45;
           this.enemyFire(enemy.x, enemy.y + 24, 300, isHoming);
           if (tier > 0) {
@@ -1086,10 +1522,25 @@ class BattleScene extends Phaser.Scene {
       return true;
     });
 
-    // Update seeking enemy shots (Homing logic)
+    // Update seeking enemy shots (Homing logic & Bomb explosion)
     this.enemyShots.children.each((child) => {
       const shot = child as Phaser.Physics.Arcade.Image;
-      if (shot.active && shot.getData("homing") === true && shot.body) {
+      if (!shot.active || !shot.body) return true;
+      
+      if (shot.getData("isBomb") === true) {
+        let timer = shot.getData("timer") - dt;
+        shot.setData("timer", timer);
+        shot.setScale(0.8 + Math.sin(this.time.now * 0.01) * 0.15);
+        if (timer <= 0) {
+          const count = 8;
+          for (let i = 0; i < count; i++) {
+            const angle = (i * Math.PI * 2) / count;
+            this.enemyFireAngle(shot.x, shot.y, angle, 280);
+          }
+          this.fx.explode(12, shot.x, shot.y);
+          shot.disableBody(true, true);
+        }
+      } else if (shot.getData("homing") === true) {
         const angle = Phaser.Math.Angle.Between(shot.x, shot.y, this.player.x, this.player.y);
         const currentAngle = Math.atan2(shot.body.velocity.y, shot.body.velocity.x);
         const nextAngle = Phaser.Math.Angle.RotateTo(currentAngle, angle, 0.05);
@@ -1114,7 +1565,34 @@ class BattleScene extends Phaser.Scene {
       shot.clearTint();
       shot.setData("homing", false);
     }
+    shot.setData("isBomb", false);
     shot.setVelocity(Math.cos(angle) * speed, Math.sin(angle) * speed);
+  }
+
+  private enemyFireAngle(x: number, y: number, angle: number, speed: number, isHoming = false) {
+    const shot = this.enemyShots.get(x, y, "enemy-shot") as Phaser.Physics.Arcade.Image;
+    if (!shot) return;
+    shot.enableBody(true, x, y, true, true);
+    shot.setActive(true).setVisible(true).setDepth(4).setScale(0.55).setBlendMode(Phaser.BlendModes.ADD);
+    if (isHoming) {
+      shot.setTint(0xa855f7);
+      shot.setData("homing", true);
+    } else {
+      shot.clearTint();
+      shot.setData("homing", false);
+    }
+    shot.setData("isBomb", false);
+    shot.setVelocity(Math.cos(angle) * speed, Math.sin(angle) * speed);
+  }
+
+  private enemyDropBomb(x: number, y: number) {
+    const bomb = this.enemyShots.get(x, y, "enemy-bomb") as Phaser.Physics.Arcade.Image;
+    if (!bomb) return;
+    bomb.enableBody(true, x, y, true, true);
+    bomb.setActive(true).setVisible(true).setDepth(4).setScale(0.8).setBlendMode(Phaser.BlendModes.ADD);
+    bomb.clearTint();
+    bomb.setVelocity(0, 160);
+    bomb.setData({ isBomb: true, timer: 1.5 });
   }
 
   private changeMode(mode: Mode) {
@@ -1290,7 +1768,7 @@ class BattleScene extends Phaser.Scene {
     hud.shield.style.transform = `scaleX(${clamp(this.playerState.shield / this.playerState.shieldMax, 0, 1)})`;
     hud.special.style.transform = `scaleX(${this.playerState.special / 100})`;
     hud.score.textContent = this.score.toLocaleString();
-    hud.wave.textContent = String(this.wave);
+    hud.wave.textContent = `${this.level}-${this.wave}`;
     hud.boss.textContent = this.bossHp > 0 ? `${Math.ceil(this.bossHp)}` : "--";
     hud.cannon.textContent = `Lv.${this.playerState.cannonLevel}`;
     hud.missile.textContent = `Lv.${this.playerState.missileLevel}`;
@@ -1298,13 +1776,21 @@ class BattleScene extends Phaser.Scene {
     hud.swarm.textContent = `Lv.${this.playerState.swarmLevel}`;
     Object.entries(hud.modeButtons).forEach(([mode, el]) => el.classList.toggle("active", mode === this.playerState.mode));
 
-    const batchNames = [
-      "Scout Swarm Incoming",
-      "Flanking Fleet Engaging",
-      "Heavy Warship Guard Wall",
-      "Boss Dreadnought Carrier Assault"
+    const batchNamesMatrix = [
+      // Level 1
+      ["Scout Swarm Incoming", "Flanking Fleet Engaging", "Heavy Warship Guard Wall", "Boss Carrier Assault"],
+      // Level 2
+      ["Kamikaze Drones Swarm", "Sleek Infiltrators Grid", "Heavy Cruiser Squad", "Boss Nebula Dreadnought"],
+      // Level 3
+      ["Heavy Bomber Formations", "Bombers & Frigates Grid", "Destroyers Vanguard Wall", "Boss Destroyer Assault"],
+      // Level 4
+      ["Shield Vanguard Grid", "Vanguards & Drones Swarm", "Dreadnought Battle Line", "Boss Fortress Assault"],
+      // Level 5
+      ["Dreadnoughts & Drones Alert", "Vanguard & Bomber Assault", "Elite Fleet Heavy Guard", "Ultimate Ragnarok Core"]
     ];
-    hud.batchName.textContent = batchNames[this.currentBatch] || "Unknown Threat";
+
+    const currentLevelBatches = batchNamesMatrix[this.level - 1] || batchNamesMatrix[0];
+    hud.batchName.textContent = currentLevelBatches[this.currentBatch] || "Unknown Threat";
   }
 
   private resize() {

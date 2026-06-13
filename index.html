@@ -27,6 +27,10 @@
           <div class="readout"><span>SCORE</span><b id="score">0</b></div>
           <div class="readout"><span>WAVE</span><b id="wave">1</b></div>
           <div class="readout"><span>BOSS</span><b id="boss">--</b></div>
+          <button class="music-btn" id="music-toggle" aria-label="Toggle Music">
+            <span class="music-icon">🎵</span>
+            <span class="music-text">音乐: 开</span>
+          </button>
         </section>
         <section class="bottom-left">
           <button class="mode-chip active" id="mode-fighter">FIGHTER</button>
@@ -46,7 +50,7 @@
           <p>骷髅战机已接入雷暴核心。<br />穿越敌阵，吞噬装备，<br />变形突袭，击沉关底巨舰。</p>
           <button id="start-button">启动出击</button>
         </div>
-      </div>
+      <div id="debug-log" style="position: absolute; bottom: 80px; left: 10px; z-index: 10000; color: #00ffcc; font-family: monospace; font-size: 12px; pointer-events: none; background: rgba(0,0,0,0.85); padding: 10px; border: 1px solid #00ffcc; max-height: 250px; width: 350px; overflow-y: auto; display: none; line-height: 1.4;"></div>
     </div>
     <script type="module" src="/src/main.ts"></script>
   </body>

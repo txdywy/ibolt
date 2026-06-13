@@ -42,6 +42,7 @@ const hud = {
   batchName: document.querySelector<HTMLElement>("#batch-name")!,
   overlay: document.querySelector<HTMLElement>("#overlay")!,
   start: document.querySelector<HTMLButtonElement>("#start-button")!,
+  musicToggle: document.querySelector<HTMLButtonElement>("#music-toggle")!,
   modeButtons: {
     fighter: document.querySelector<HTMLElement>("#mode-fighter")!,
     gerwalk: document.querySelector<HTMLElement>("#mode-gerwalk")!,
@@ -1314,6 +1315,22 @@ class BattleScene extends Phaser.Scene {
     });
 
     hud.start.addEventListener("click", () => this.startRun());
+
+    hud.musicToggle.addEventListener("click", () => {
+      const isEnabled = audio.toggleMusic();
+      const icon = hud.musicToggle.querySelector(".music-icon")!;
+      const text = hud.musicToggle.querySelector(".music-text")!;
+      if (isEnabled) {
+        hud.musicToggle.classList.remove("muted");
+        icon.textContent = "🎵";
+        text.textContent = "音乐: 开";
+      } else {
+        hud.musicToggle.classList.add("muted");
+        icon.textContent = "🔇";
+        text.textContent = "音乐: 关";
+      }
+    });
+
     this.updateHud();
     this.scale.on("resize", this.resize, this);
     this.resize();

@@ -182,6 +182,58 @@ body {
   box-shadow: 0 0 15px rgba(81, 246, 255, 0.4);
 }
 
+.music-btn {
+  pointer-events: auto;
+  cursor: pointer;
+  min-width: 86px;
+  padding: 7px 9px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  border: 1px solid var(--line);
+  background:
+    linear-gradient(135deg, rgba(81, 246, 255, 0.12), rgba(255, 71, 126, 0.08)),
+    var(--panel);
+  box-shadow:
+    inset 0 0 24px rgba(81, 246, 255, 0.06),
+    0 10px 34px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(10px);
+  color: #ffffff;
+  font-family: inherit;
+  transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.music-btn:hover {
+  border-color: var(--cyan);
+  color: #ffffff;
+  box-shadow: 0 0 15px var(--cyan-soft);
+  transform: translateY(-2px);
+}
+
+.music-btn .music-icon {
+  font-size: 14px;
+}
+
+.music-btn .music-text {
+  color: rgba(239, 250, 255, 0.72);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.music-btn.muted {
+  border-color: rgba(255, 71, 126, 0.4);
+  background: linear-gradient(135deg, rgba(255, 71, 126, 0.15), rgba(6, 17, 31, 0.8));
+  box-shadow:
+    inset 0 0 24px rgba(255, 71, 126, 0.06),
+    0 10px 34px rgba(0, 0, 0, 0.25);
+}
+
+.music-btn.muted .music-text {
+  color: rgba(255, 71, 126, 0.7);
+}
+
 .special {
   min-width: 140px;
 }

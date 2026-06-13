@@ -6,6 +6,7 @@ export class ProceduralAudio {
   private nextNoteTime = 0;
   private scheduleAheadTime = 0.1;
   private isMusicPlaying = false;
+  private isMusicEnabled = true;
   private masterGain: GainNode | null = null;
   private level = 1;
   private currentBar = 0;
@@ -19,6 +20,20 @@ export class ProceduralAudio {
     this.masterGain = this.ctx.createGain();
     this.masterGain.gain.setValueAtTime(0.5, this.ctx.currentTime);
     this.masterGain.connect(this.ctx.destination);
+  }
+
+  public toggleMusic() {
+    this.isMusicEnabled = !this.isMusicEnabled;
+    if (this.isMusicEnabled) {
+      this.startMusic();
+    } else {
+      this.stopMusic();
+    }
+    return this.isMusicEnabled;
+  }
+
+  public getMusicEnabled() {
+    return this.isMusicEnabled;
   }
 
   public setLevel(lvl: number) {
@@ -209,6 +224,7 @@ export class ProceduralAudio {
   }
 
   public startMusic() {
+    if (!this.isMusicEnabled) return;
     if (this.isMusicPlaying) return;
     this.init();
     this.resume();

@@ -1,5 +1,6 @@
 import Phaser from "phaser";
 import { gsap } from "gsap";
+import { audio } from "./audio";
 import "./styles.css";
 
 type Mode = "fighter" | "gerwalk" | "armor";
@@ -1035,6 +1036,9 @@ class BattleScene extends Phaser.Scene {
   }
 
   private startRun() {
+    audio.init();
+    audio.startMusic();
+    audio.resume();
     hud.overlay.classList.remove("visible");
     this.pausedByOverlay = false;
     this.resetState();
@@ -1093,6 +1097,7 @@ class BattleScene extends Phaser.Scene {
     this.missileTimer -= dt;
 
     if (this.fireTimer <= 0) {
+      audio.playLaser();
       if (this.playerState.mode === "fighter") {
         // Fighter: Fast Concentrated lasers
         this.fireTimer = 0.075;
@@ -1141,6 +1146,7 @@ class BattleScene extends Phaser.Scene {
 
     if (this.missileTimer <= 0 && this.playerState.missileLevel > 0) {
       this.missileTimer = Math.max(0.48, 1.2 - this.playerState.missileLevel * 0.12);
+      audio.playMissile();
       const pairs = this.playerState.mode === "armor" ? 2 : 1;
       for (let i = 0; i < pairs; i += 1) {
         const side = i % 2 === 0 ? -34 : 34;
@@ -1173,6 +1179,7 @@ class BattleScene extends Phaser.Scene {
       this.swarmTimer -= dt;
       if (this.swarmTimer <= 0) {
         this.swarmTimer = Math.max(0.32, 1.0 - this.playerState.swarmLevel * 0.15);
+        audio.playMissile();
         const count = this.playerState.swarmLevel * 2;
         for (let i = 0; i < count; i += 1) {
           const rx = this.player.x + Phaser.Math.Between(-24, 24);
@@ -1227,6 +1234,7 @@ class BattleScene extends Phaser.Scene {
           this.level = 1;
           this.wave += 1;
         }
+        audio.setLevel(this.level);
         this.currentBatch = 0;
         this.batchSpawnedCount = 0;
         this.maxBatchSpawns = 10 + this.wave * 2;
@@ -1597,6 +1605,7 @@ class BattleScene extends Phaser.Scene {
 
   private changeMode(mode: Mode) {
     if (this.pausedByOverlay || this.playerState.mode === mode) return;
+    audio.playModeChange();
     this.playerState.mode = mode;
     this.player.setTexture(`player-${mode}`);
     this.playerState.shield = clamp(this.playerState.shield + (mode === "armor" ? 20 : 8), 0, this.playerState.shieldMax);
@@ -1621,6 +1630,7 @@ class BattleScene extends Phaser.Scene {
 
   private special() {
     if (this.pausedByOverlay || this.playerState.special < 100) return;
+    audio.playSpecial();
     this.playerState.special = 0;
     this.cameras.main.shake(540, 0.018);
     this.cameras.main.flash(220, 255, 203, 87, false);
@@ -1661,6 +1671,7 @@ class BattleScene extends Phaser.Scene {
 
   private killEnemy(enemy: Phaser.Physics.Arcade.Sprite) {
     const kind = enemy.getData("kind") as string;
+    audio.playExplosion(kind === "boss");
     this.fx.explode(kind === "boss" ? 130 : kind === "frigate" ? 44 : 22, enemy.x, enemy.y);
     this.cameras.main.shake(kind === "boss" ? 900 : 160, kind === "boss" ? 0.026 : 0.005);
     this.score += kind === "boss" ? 10000 : kind === "frigate" ? 840 : 180;
@@ -1693,6 +1704,7 @@ class BattleScene extends Phaser.Scene {
   private collectPickup: Phaser.Types.Physics.Arcade.ArcadePhysicsCallback = (_playerObj, pickupObj) => {
     const pickup = pickupObj as Phaser.Physics.Arcade.Image;
     const kind = pickup.getData("kind") as PickupKind;
+    audio.playPickup();
     if (kind === "cannon") this.playerState.cannonLevel = clamp(this.playerState.cannonLevel + 1, 1, 5);
     if (kind === "missile") this.playerState.missileLevel = clamp(this.playerState.missileLevel + 1, 1, 5);
     if (kind === "laser") this.playerState.laserLevel = clamp(this.playerState.laserLevel + 1, 0, 5);
@@ -1739,6 +1751,8 @@ class BattleScene extends Phaser.Scene {
 
   private gameOver() {
     this.pausedByOverlay = true;
+    audio.playGameOver();
+    audio.stopMusic();
     hud.overlay.classList.add("visible");
     hud.overlay.querySelector(".title")!.textContent = "MISSION FAILED";
     hud.overlay.querySelector("p")!.textContent = `得分 ${this.score.toLocaleString()}。核心已保存战斗数据，点击重新出击。`;

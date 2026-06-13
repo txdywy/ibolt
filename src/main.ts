@@ -4,7 +4,7 @@ import { audio } from "./audio";
 import "./styles.css";
 
 type Mode = "fighter" | "gerwalk" | "armor";
-type PickupKind = "cannon" | "missile" | "repair" | "core" | "laser" | "swarm";
+type PickupKind = "cannon" | "missile" | "repair" | "core" | "laser" | "swarm" | "nuke" | "lightning" | "aegis";
 
 interface PlayerState {
   hp: number;
@@ -16,6 +16,9 @@ interface PlayerState {
   missileLevel: number;
   laserLevel: number;
   swarmLevel: number;
+  lightningLevel: number;
+  aegisLevel: number;
+  nukeStock: number;
   special: number;
   invuln: number;
 }
@@ -707,6 +710,280 @@ class BootScene extends Phaser.Scene {
     };
     createEnemyBomb();
 
+    // 4g. Multi-functional Battleship Textures
+    // Shield Projector
+    const createShieldProjectorTex = () => {
+      const size = 144;
+      const tex = this.textures.createCanvas("enemy-shield-projector", size, size)!;
+      const ctx = tex.getCanvas().getContext("2d")!;
+      const cx = size / 2;
+      const cy = size / 2;
+      ctx.shadowBlur = 16;
+      ctx.shadowColor = "#06b6d4";
+      ctx.fillStyle = "#06182c";
+      ctx.strokeStyle = "#22d3ee";
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy - 40);
+      ctx.lineTo(cx + 40, cy - 10);
+      ctx.lineTo(cx + 50, cy + 30);
+      ctx.lineTo(cx + 20, cy + 45);
+      ctx.lineTo(cx - 20, cy + 45);
+      ctx.lineTo(cx - 50, cy + 30);
+      ctx.lineTo(cx - 40, cy - 10);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      // Core emitter
+      ctx.fillStyle = "#ffffff";
+      ctx.beginPath();
+      ctx.arc(cx, cy + 5, 8, 0, Math.PI * 2);
+      ctx.fill();
+      tex.refresh();
+    };
+    createShieldProjectorTex();
+
+    // Beam Cruiser
+    const createBeamCruiserTex = () => {
+      const size = 160;
+      const tex = this.textures.createCanvas("enemy-beam-cruiser", size, size)!;
+      const ctx = tex.getCanvas().getContext("2d")!;
+      const cx = size / 2;
+      const cy = size / 2;
+      ctx.shadowBlur = 18;
+      ctx.shadowColor = "#f97316";
+      ctx.fillStyle = "#1e0b02";
+      ctx.strokeStyle = "#fb923c";
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(cx - 15, cy - 60);
+      ctx.lineTo(cx + 15, cy - 60);
+      ctx.lineTo(cx + 20, cy - 20);
+      ctx.lineTo(cx + 50, cy + 20);
+      ctx.lineTo(cx + 30, cy + 50);
+      ctx.lineTo(cx - 30, cy + 50);
+      ctx.lineTo(cx - 50, cy + 20);
+      ctx.lineTo(cx - 20, cy - 20);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      // Glow indicators
+      ctx.fillStyle = "#f97316";
+      ctx.fillRect(cx - 4, cy - 50, 8, 20);
+      tex.refresh();
+    };
+    createBeamCruiserTex();
+
+    // Mine Carrier
+    const createMineCarrierTex = () => {
+      const size = 144;
+      const tex = this.textures.createCanvas("enemy-mine-carrier", size, size)!;
+      const ctx = tex.getCanvas().getContext("2d")!;
+      const cx = size / 2;
+      const cy = size / 2;
+      ctx.shadowBlur = 16;
+      ctx.shadowColor = "#e11d48";
+      ctx.fillStyle = "#1c060d";
+      ctx.strokeStyle = "#fb7185";
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy - 45);
+      ctx.lineTo(cx + 45, cy - 20);
+      ctx.lineTo(cx + 45, cy + 20);
+      ctx.lineTo(cx, cy + 45);
+      ctx.lineTo(cx - 45, cy + 20);
+      ctx.lineTo(cx - 45, cy - 20);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      // Launch tubes
+      ctx.fillStyle = "#fb7185";
+      ctx.fillRect(cx - 25, cy - 5, 8, 16);
+      ctx.fillRect(cx + 17, cy - 5, 8, 16);
+      tex.refresh();
+    };
+    createMineCarrierTex();
+
+    // Space Mine
+    const createSpaceMineTex = () => {
+      const size = 48;
+      const tex = this.textures.createCanvas("space-mine", size, size)!;
+      const ctx = tex.getCanvas().getContext("2d")!;
+      const cx = size / 2;
+      const cy = size / 2;
+      ctx.shadowBlur = 12;
+      ctx.shadowColor = "#ef4444";
+      ctx.fillStyle = "#1e0b0b";
+      ctx.strokeStyle = "#f87171";
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(cx, cy, 14, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+
+      // Spikes
+      ctx.strokeStyle = "#ef4444";
+      ctx.lineWidth = 2.5;
+      for (let i = 0; i < 8; i++) {
+        const angle = (i * Math.PI * 2) / 8;
+        ctx.beginPath();
+        ctx.moveTo(cx + Math.cos(angle) * 14, cy + Math.sin(angle) * 14);
+        ctx.lineTo(cx + Math.cos(angle) * 22, cy + Math.sin(angle) * 22);
+        ctx.stroke();
+      }
+      tex.refresh();
+    };
+    createSpaceMineTex();
+
+    // Shield Dome aura
+    const createShieldDomeTex = () => {
+      const size = 220;
+      const tex = this.textures.createCanvas("enemy-shield-dome", size, size)!;
+      const ctx = tex.getCanvas().getContext("2d")!;
+      const cx = size / 2;
+      const cy = size / 2;
+      const grad = ctx.createRadialGradient(cx, cy, 80, cx, cy, 108);
+      grad.addColorStop(0, "rgba(6, 182, 212, 0)");
+      grad.addColorStop(0.7, "rgba(6, 182, 212, 0.15)");
+      grad.addColorStop(0.9, "rgba(6, 182, 212, 0.45)");
+      grad.addColorStop(1, "rgba(255, 255, 255, 0.8)");
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(cx, cy, 108, 0, Math.PI * 2);
+      ctx.fill();
+      tex.refresh();
+    };
+    createShieldDomeTex();
+
+    // 4h. Advanced Weapon Textures
+    // Player Tactical Nuke
+    const createNukeBombTex = () => {
+      const tex = this.textures.createCanvas("nuke-bomb", 48, 64)!;
+      const ctx = tex.getCanvas().getContext("2d")!;
+      ctx.shadowBlur = 12;
+      ctx.shadowColor = "#facc15";
+      ctx.fillStyle = "#1e1e1e";
+      ctx.strokeStyle = "#eab308";
+      ctx.lineWidth = 3;
+      // Drawing nuke silhouette
+      ctx.beginPath();
+      ctx.moveTo(24, 4);
+      ctx.lineTo(36, 20);
+      ctx.lineTo(36, 44);
+      ctx.lineTo(44, 56);
+      ctx.lineTo(4, 56);
+      ctx.lineTo(12, 44);
+      ctx.lineTo(12, 20);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      // Yellow hazard stripes
+      ctx.fillStyle = "#eab308";
+      ctx.fillRect(16, 28, 16, 6);
+      tex.refresh();
+    };
+    createNukeBombTex();
+
+    // Nuke Blast Shockwave
+    const createNukeBlastTex = () => {
+      const size = 256;
+      const tex = this.textures.createCanvas("nuke-blast", size, size)!;
+      const ctx = tex.getCanvas().getContext("2d")!;
+      const cx = size / 2;
+      const cy = size / 2;
+      const grad = ctx.createRadialGradient(cx, cy, 10, cx, cy, 128);
+      grad.addColorStop(0, "#ffffff");
+      grad.addColorStop(0.2, "#fda4af");
+      grad.addColorStop(0.5, "#f43f5e");
+      grad.addColorStop(0.8, "#ea580c");
+      grad.addColorStop(1, "rgba(234, 88, 12, 0)");
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(cx, cy, 128, 0, Math.PI * 2);
+      ctx.fill();
+      tex.refresh();
+    };
+    createNukeBlastTex();
+
+    // Lightning Spark
+    const createLightningSparkTex = () => {
+      const tex = this.textures.createCanvas("lightning-spark", 32, 32)!;
+      const ctx = tex.getCanvas().getContext("2d")!;
+      ctx.shadowBlur = 10;
+      ctx.shadowColor = "#60a5fa";
+      ctx.fillStyle = "#ffffff";
+      ctx.beginPath();
+      ctx.moveTo(16, 2);
+      ctx.lineTo(20, 12);
+      ctx.lineTo(30, 16);
+      ctx.lineTo(20, 20);
+      ctx.lineTo(16, 30);
+      ctx.lineTo(12, 20);
+      ctx.lineTo(2, 16);
+      ctx.lineTo(12, 12);
+      ctx.closePath();
+      ctx.fill();
+      tex.refresh();
+    };
+    createLightningSparkTex();
+
+    // Aegis Shield Orbiter
+    const createAegisOrbiterTex = () => {
+      const tex = this.textures.createCanvas("aegis-orbiter", 32, 32)!;
+      const ctx = tex.getCanvas().getContext("2d")!;
+      ctx.shadowBlur = 10;
+      ctx.shadowColor = "#06b6d4";
+      ctx.fillStyle = "#0e7490";
+      ctx.strokeStyle = "#22d3ee";
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.arc(16, 16, 10, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+
+      // Glowing core
+      ctx.fillStyle = "#ffffff";
+      ctx.beginPath();
+      ctx.arc(16, 16, 4, 0, Math.PI * 2);
+      ctx.fill();
+      tex.refresh();
+    };
+    createAegisOrbiterTex();
+
+    // Enemy Toxic Nuke
+    const createEnemyNukeTex = () => {
+      const tex = this.textures.createCanvas("enemy-nuke", 64, 64)!;
+      const ctx = tex.getCanvas().getContext("2d")!;
+      ctx.shadowBlur = 14;
+      ctx.shadowColor = "#22c55e";
+      ctx.fillStyle = "#052e16";
+      ctx.strokeStyle = "#4ade80";
+      ctx.lineWidth = 3.5;
+      ctx.beginPath();
+      ctx.moveTo(32, 4);
+      ctx.lineTo(46, 24);
+      ctx.lineTo(46, 48);
+      ctx.lineTo(54, 60);
+      ctx.lineTo(10, 60);
+      ctx.lineTo(18, 48);
+      ctx.lineTo(18, 24);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      // Radiation symbol
+      ctx.fillStyle = "#22c55e";
+      ctx.beginPath();
+      ctx.arc(32, 36, 6, 0, Math.PI * 2);
+      ctx.fill();
+      tex.refresh();
+    };
+    createEnemyNukeTex();
+
     // 5. Upgrade Projectiles & Particles
     const createBolt = () => {
       const tex = this.textures.createCanvas("bolt", 16, 48)!;
@@ -853,6 +1130,9 @@ class BattleScene extends Phaser.Scene {
   private lasers!: Phaser.Physics.Arcade.Group;
   private enemies!: Phaser.Physics.Arcade.Group;
   private enemyShots!: Phaser.Physics.Arcade.Group;
+  private enemyShields!: Phaser.Physics.Arcade.Group;
+  private aegisGroup!: Phaser.Physics.Arcade.Group;
+  private laserGraphics!: Phaser.GameObjects.Graphics;
   private pickups!: Phaser.Physics.Arcade.Group;
   private fx!: Phaser.GameObjects.Particles.ParticleEmitter;
   private thrusterFx!: Phaser.GameObjects.Particles.ParticleEmitter;
@@ -868,7 +1148,10 @@ class BattleScene extends Phaser.Scene {
     laserLevel: 0,
     swarmLevel: 0,
     special: 0,
-    invuln: 0
+    invuln: 0,
+    lightningLevel: 0,
+    aegisLevel: 0,
+    nukeStock: 1
   };
   private score = 0;
   private wave = 1;
@@ -899,6 +1182,9 @@ class BattleScene extends Phaser.Scene {
     this.lasers = this.physics.add.group({ classType: Phaser.Physics.Arcade.Sprite, maxSize: 5 });
     this.enemies = this.physics.add.group({ classType: Phaser.Physics.Arcade.Sprite, maxSize: 60 });
     this.enemyShots = this.physics.add.group({ classType: Phaser.Physics.Arcade.Image, maxSize: 100 });
+    this.enemyShields = this.physics.add.group({ classType: Phaser.Physics.Arcade.Sprite });
+    this.aegisGroup = this.physics.add.group({ classType: Phaser.Physics.Arcade.Sprite });
+    this.laserGraphics = this.add.graphics().setDepth(5);
     this.pickups = this.physics.add.group({ classType: Phaser.Physics.Arcade.Image, maxSize: 24 });
     this.player = this.physics.add.sprite(W / 2, H - 170, "player-fighter").setDepth(8);
     this.player.setCollideWorldBounds(true);
@@ -927,16 +1213,24 @@ class BattleScene extends Phaser.Scene {
       emitting: false
     });
     this.cursors = this.input.keyboard!.createCursorKeys();
-    this.keys = this.input.keyboard!.addKeys("W,A,S,D,SPACE,X,P") as Record<string, Phaser.Input.Keyboard.Key>;
+    this.keys = this.input.keyboard!.addKeys("W,A,S,D,SPACE,X,P,C") as Record<string, Phaser.Input.Keyboard.Key>;
     this.input.keyboard!.on("keydown-SPACE", () => this.cycleMode());
     this.input.keyboard!.on("keydown-X", () => this.special());
     this.input.keyboard!.on("keydown-P", () => this.togglePause());
+    this.input.keyboard!.on("keydown-C", () => this.launchNuke());
     this.physics.add.overlap(this.bullets, this.enemies, this.hitEnemy, undefined, this);
     this.physics.add.overlap(this.missiles, this.enemies, this.hitEnemyWithMissile, undefined, this);
     this.physics.add.overlap(this.player, this.enemies, this.ramPlayer, undefined, this);
     this.physics.add.overlap(this.player, this.enemyShots, this.shotPlayer, undefined, this);
     this.physics.add.overlap(this.player, this.pickups, this.collectPickup, undefined, this);
     this.physics.add.overlap(this.lasers, this.enemies, this.hitEnemyWithLaser, undefined, this);
+    this.physics.add.overlap(this.bullets, this.enemyShields, this.hitEnemyShield, undefined, this);
+    this.physics.add.overlap(this.missiles, this.enemyShields, this.hitEnemyShield, undefined, this);
+    this.physics.add.overlap(this.lasers, this.enemyShields, this.hitEnemyShieldWithLaser, undefined, this);
+    this.physics.add.overlap(this.enemyShots, this.aegisGroup, this.hitAegis, undefined, this);
+    this.physics.add.overlap(this.bullets, this.enemyShots, this.hitEnemyShot, undefined, this);
+    this.physics.add.overlap(this.missiles, this.enemyShots, this.hitEnemyShot, undefined, this);
+    this.physics.add.overlap(this.lasers, this.enemyShots, this.hitEnemyShotWithLaser, undefined, this);
 
     // Click listeners for HUD mode buttons
     Object.entries(hud.modeButtons).forEach(([mode, el]) => {
@@ -987,6 +1281,70 @@ class BattleScene extends Phaser.Scene {
       this.shieldBubble.setAlpha(0.8);
       this.shieldBubble.setScale(0.75);
     }
+
+    // Sync Shield Domes to Projector owners
+    this.enemyShields.children.each((child) => {
+      const dome = child as Phaser.Physics.Arcade.Sprite;
+      if (!dome.active) return true;
+      const owner = dome.getData("owner");
+      if (!owner || !owner.active) {
+        dome.disableBody(true, true);
+      } else {
+        dome.setPosition(owner.x, owner.y);
+      }
+      return true;
+    });
+
+    // Manage Aegis Orbiters
+    const targetCount = this.playerState.aegisLevel > 0 ? 2 : 0;
+    const activeOrbiters = this.aegisGroup.getChildren() as Phaser.Physics.Arcade.Sprite[];
+    if (activeOrbiters.length < targetCount) {
+      for (let i = activeOrbiters.length; i < targetCount; i++) {
+        const orb = this.aegisGroup.create(this.player.x, this.player.y, "aegis-orbiter") as Phaser.Physics.Arcade.Sprite;
+        orb.enableBody(true, this.player.x, this.player.y, true, true);
+        orb.setActive(true).setVisible(true).setDepth(9).setCircle(10, 6, 6);
+      }
+    } else if (activeOrbiters.length > targetCount) {
+      for (let i = activeOrbiters.length - 1; i >= targetCount; i--) {
+        activeOrbiters[i].destroy();
+      }
+    }
+    if (targetCount > 0) {
+      const angleStep = (Math.PI * 2) / targetCount;
+      const radius = 64;
+      const speed = 0.003;
+      const elapsed = this.time.now * speed;
+      activeOrbiters.forEach((orb, idx) => {
+        const angle = elapsed + idx * angleStep;
+        const targetX = this.player.x + Math.cos(angle) * radius;
+        const targetY = this.player.y + Math.sin(angle) * radius;
+        orb.setPosition(targetX, targetY);
+      });
+    }
+
+    // Draw active warning laser lines and sweeping heavy beams
+    this.laserGraphics.clear();
+    this.enemies.children.each((child) => {
+      const enemy = child as Phaser.Physics.Arcade.Sprite;
+      if (!enemy.active) return true;
+      if (enemy.getData("kind") === "beam-cruiser") {
+        const state = enemy.getData("beamState") || "idle";
+        if (state === "targeting") {
+          this.laserGraphics.lineStyle(2, 0xff0000, 0.7);
+          this.laserGraphics.lineBetween(enemy.x, enemy.y + 40, enemy.x, H);
+        } else if (state === "firing") {
+          const width = 36 + Math.sin(this.time.now * 0.06) * 10;
+          this.laserGraphics.lineStyle(width, 0xf97316, 0.85);
+          this.laserGraphics.lineBetween(enemy.x, enemy.y + 45, enemy.x, H);
+          this.laserGraphics.lineStyle(width * 0.4, 0xffffff, 0.95);
+          this.laserGraphics.lineBetween(enemy.x, enemy.y + 45, enemy.x, H);
+          if (Math.abs(this.player.x - enemy.x) < (width / 2 + 16) && this.player.y > enemy.y) {
+            this.damagePlayer(42 * dt);
+          }
+        }
+      }
+      return true;
+    });
 
     // Warning Banner alerts
     if (this.warningTimer > 0) {
@@ -1056,6 +1414,9 @@ class BattleScene extends Phaser.Scene {
       missileLevel: 1,
       laserLevel: 0,
       swarmLevel: 0,
+      lightningLevel: 0,
+      aegisLevel: 0,
+      nukeStock: 1,
       special: 35,
       invuln: 1.4
     };
@@ -1099,7 +1460,7 @@ class BattleScene extends Phaser.Scene {
     if (this.fireTimer <= 0) {
       audio.playLaser();
       if (this.playerState.mode === "fighter") {
-        // Fighter: Fast Concentrated lasers
+        // Fighter: Fast Concentrated lasers + Chain Lightning
         this.fireTimer = 0.075;
         const spread = this.playerState.cannonLevel;
         for (let i = 0; i < spread; i += 1) {
@@ -1114,32 +1475,51 @@ class BattleScene extends Phaser.Scene {
           bullet.setVelocity(0, -1320);
           bullet.setData("damage", 12 + this.playerState.cannonLevel * 4);
         }
+
+        // Chain Lightning sub-weapon
+        if (this.playerState.lightningLevel > 0) {
+          const chainTargets = (this.enemies.getChildren() as Phaser.Physics.Arcade.Sprite[]).filter((e) => e.active && e.y > 0 && Phaser.Math.Distance.Between(this.player.x, this.player.y, e.x, e.y) < 550);
+          if (chainTargets.length > 0 && Math.random() < 0.32) {
+            const target = Phaser.Utils.Array.GetRandom(chainTargets);
+            this.laserGraphics.lineStyle(3.5, 0x60a5fa, 0.95);
+            this.laserGraphics.lineBetween(this.player.x, this.player.y - 30, target.x, target.y);
+            this.damageEnemy(target, 16 * this.playerState.lightningLevel, false);
+
+            const remaining = chainTargets.filter((e) => e !== target && Phaser.Math.Distance.Between(target.x, target.y, e.x, e.y) < 220);
+            if (remaining.length > 0) {
+              const bounceTarget = Phaser.Utils.Array.GetRandom(remaining);
+              this.laserGraphics.lineStyle(2, 0x93c5fd, 0.85);
+              this.laserGraphics.lineBetween(target.x, target.y, bounceTarget.x, bounceTarget.y);
+              this.damageEnemy(bounceTarget, 10 * this.playerState.lightningLevel, false);
+            }
+          }
+        }
       } else if (this.playerState.mode === "gerwalk") {
-        // Gerwalk: Medium spread fire
-        this.fireTimer = 0.11;
-        const spread = this.playerState.cannonLevel + 1;
-        for (let i = 0; i < spread; i += 1) {
-          const angle = ((i - (spread - 1) / 2) * 10 * Math.PI) / 180;
+        // Gerwalk: Wide Scatter Shotgun
+        this.fireTimer = 0.12;
+        const count = 5 + this.playerState.cannonLevel;
+        for (let i = 0; i < count; i += 1) {
+          const angle = ((i - (count - 1) / 2) * 8 * Math.PI) / 180;
           const bullet = this.bullets.get(this.player.x, this.player.y - 46, "bolt") as Phaser.Physics.Arcade.Image;
           if (!bullet) continue;
           bullet.enableBody(true, this.player.x, this.player.y - 46, true, true);
           bullet.setActive(true).setVisible(true).setDepth(4).setBlendMode(Phaser.BlendModes.ADD);
           bullet.clearTint();
           bullet.setScale(1);
-          bullet.setVelocity(Math.sin(angle) * 960, -Math.cos(angle) * 960);
+          bullet.setVelocity(Math.sin(angle) * 1050, -Math.cos(angle) * 1050);
           bullet.setRotation(angle);
-          bullet.setData("damage", 10 + this.playerState.cannonLevel * 3.5);
+          bullet.setData("damage", 9 + this.playerState.cannonLevel * 3.2);
         }
       } else {
-        // Armor: Heavy plasma bolts (slow, huge damage)
-        this.fireTimer = 0.22;
+        // Armor: Heavy Hyper Cannon plasma shells (heavy splash)
+        this.fireTimer = 0.28;
         const bullet = this.bullets.get(this.player.x, this.player.y - 46, "enemy-shot") as Phaser.Physics.Arcade.Image;
         if (bullet) {
           bullet.enableBody(true, this.player.x, this.player.y - 46, true, true);
-          bullet.setActive(true).setVisible(true).setDepth(4).setScale(1.3).setBlendMode(Phaser.BlendModes.ADD).setTint(0xff477e);
-          bullet.setVelocity(0, -780);
+          bullet.setActive(true).setVisible(true).setDepth(4).setScale(1.6).setBlendMode(Phaser.BlendModes.ADD).setTint(0x38bdf8);
+          bullet.setVelocity(0, -840);
           bullet.setRotation(0);
-          bullet.setData("damage", 48 + this.playerState.cannonLevel * 16);
+          bullet.setData({ damage: 60 + this.playerState.cannonLevel * 20, isHyperShell: true });
         }
       }
     }
@@ -1275,29 +1655,41 @@ class BattleScene extends Phaser.Scene {
             }
           } else if (this.level === 3) {
             if (this.currentBatch === 0) {
-              this.spawnEnemy("bomber");
+              this.spawnEnemy(Math.random() < 0.75 ? "bomber" : "shield-projector");
             } else if (this.currentBatch === 1) {
-              this.spawnEnemy(Math.random() < 0.6 ? "bomber" : "frigate");
+              const roll = Math.random();
+              this.spawnEnemy(roll < 0.5 ? "bomber" : roll < 0.8 ? "frigate" : "mine-carrier");
             } else {
-              this.spawnEnemy(Math.random() < 0.5 ? "destroyer" : "bomber");
+              const roll = Math.random();
+              this.spawnEnemy(roll < 0.4 ? "destroyer" : roll < 0.8 ? "bomber" : "mine-carrier");
             }
           } else if (this.level === 4) {
             if (this.currentBatch === 0) {
-              this.spawnEnemy("vanguard");
+              this.spawnEnemy(Math.random() < 0.75 ? "vanguard" : "shield-projector");
             } else if (this.currentBatch === 1) {
-              this.spawnEnemy(Math.random() < 0.6 ? "vanguard" : "drone");
+              const roll = Math.random();
+              this.spawnEnemy(roll < 0.5 ? "vanguard" : roll < 0.8 ? "drone" : "beam-cruiser");
             } else {
-              this.spawnEnemy(Math.random() < 0.5 ? "cruiser" : "dreadnought");
+              const roll = Math.random();
+              this.spawnEnemy(roll < 0.4 ? "cruiser" : roll < 0.75 ? "dreadnought" : "beam-cruiser");
             }
           } else {
             // Level 5
             if (this.currentBatch === 0) {
-              this.spawnEnemy(Math.random() < 0.5 ? "dreadnought" : "drone");
+              const roll = Math.random();
+              this.spawnEnemy(roll < 0.45 ? "dreadnought" : roll < 0.8 ? "drone" : "shield-projector");
             } else if (this.currentBatch === 1) {
-              this.spawnEnemy(Math.random() < 0.5 ? "vanguard" : "bomber");
+              const roll = Math.random();
+              this.spawnEnemy(roll < 0.45 ? "vanguard" : roll < 0.8 ? "bomber" : "mine-carrier");
             } else {
               const roll = Math.random();
-              this.spawnEnemy(roll < 0.4 ? "dreadnought" : roll < 0.7 ? "cruiser" : "destroyer");
+              this.spawnEnemy(
+                roll < 0.25 ? "dreadnought" :
+                roll < 0.50 ? "cruiser" :
+                roll < 0.70 ? "destroyer" :
+                roll < 0.80 ? "beam-cruiser" :
+                roll < 0.90 ? "mine-carrier" : "shield-projector"
+              );
             }
           }
         }
@@ -1305,7 +1697,7 @@ class BattleScene extends Phaser.Scene {
     }
   }
 
-  private spawnEnemy(kind: "scout" | "frigate" | "destroyer" | "cruiser" | "bomber" | "drone" | "vanguard" | "dreadnought" | "boss") {
+  private spawnEnemy(kind: "scout" | "frigate" | "destroyer" | "cruiser" | "bomber" | "drone" | "vanguard" | "dreadnought" | "shield-projector" | "beam-cruiser" | "mine-carrier" | "boss") {
     let key = "enemy-scout";
     if (kind === "frigate") key = "enemy-frigate";
     else if (kind === "destroyer") key = "enemy-destroyer";
@@ -1314,6 +1706,9 @@ class BattleScene extends Phaser.Scene {
     else if (kind === "drone") key = "enemy-drone";
     else if (kind === "vanguard") key = "enemy-vanguard";
     else if (kind === "dreadnought") key = "enemy-dreadnought";
+    else if (kind === "shield-projector") key = "enemy-shield-projector";
+    else if (kind === "beam-cruiser") key = "enemy-beam-cruiser";
+    else if (kind === "mine-carrier") key = "enemy-mine-carrier";
     else if (kind === "boss") {
       const bossKeys = ["boss-carrier", "boss-nebula", "boss-destroyer", "boss-fortress", "boss-ragnarok"];
       key = bossKeys[this.level - 1] || "boss-carrier";
@@ -1377,6 +1772,21 @@ class BattleScene extends Phaser.Scene {
       sizeRadius = 60;
       speedY = Phaser.Math.Between(60, 100) + this.wave * 2;
       isHeavy = true;
+    } else if (kind === "shield-projector") {
+      hp = 380 + this.wave * 40;
+      sizeRadius = 48;
+      speedY = Phaser.Math.Between(60, 90) + this.wave * 2;
+      isHeavy = true;
+    } else if (kind === "beam-cruiser") {
+      hp = 440 + this.wave * 50;
+      sizeRadius = 54;
+      speedY = Phaser.Math.Between(70, 100) + this.wave * 2;
+      isHeavy = true;
+    } else if (kind === "mine-carrier") {
+      hp = 500 + this.wave * 60;
+      sizeRadius = 50;
+      speedY = Phaser.Math.Between(80, 120) + this.wave * 3;
+      isHeavy = true;
     } else if (kind === "boss") {
       const bossHps = [1800, 3000, 4500, 6000, 9000];
       hp = (bossHps[this.level - 1] || 1800) + this.wave * 300;
@@ -1404,6 +1814,18 @@ class BattleScene extends Phaser.Scene {
     enemy.setAngularVelocity(kind === "scout" || kind === "drone" ? Phaser.Math.Between(-45, 45) : 0);
     enemy.setCircle(sizeRadius, kind === "boss" ? 76 : 0, kind === "boss" ? 22 : 0);
 
+    // Spawn Shield Dome if Shield Projector
+    if (kind === "shield-projector") {
+      const dome = this.enemyShields.get(x, y, "enemy-shield-dome") as Phaser.Physics.Arcade.Sprite;
+      if (dome) {
+        dome.enableBody(true, x, y, true, true);
+        dome.setActive(true).setVisible(true).setDepth(4).setScale(1.0).setBlendMode(Phaser.BlendModes.ADD);
+        dome.setData({ owner: enemy, hp: 300 + this.wave * 50, hpMax: 300 + this.wave * 50 });
+        dome.setCircle(92, 18, 18);
+        enemy.setData("shieldDome", dome);
+      }
+    }
+
     if (isHeavy || tier > 0) {
       this.warningTimer = 2.2;
       this.cameras.main.shake(450, 0.01);
@@ -1425,6 +1847,14 @@ class BattleScene extends Phaser.Scene {
         const droneSpeed = 260 + this.wave * 12;
         enemy.setVelocity(Math.cos(angle) * droneSpeed, Math.sin(angle) * droneSpeed);
         enemy.setRotation(angle + Math.PI / 2);
+      } else if (kind === "beam-cruiser") {
+        const state = enemy.getData("beamState") || "idle";
+        if (state === "targeting" || state === "firing") {
+          enemy.setVelocity(0, 0); // Stops completely when charging or firing
+        } else {
+          enemy.x += Math.sin(this.time.now * 0.0018 + enemy.getData("sway")) * 1.5;
+          enemy.setVelocityY(80 + this.wave * 2);
+        }
       } else {
         enemy.x += Math.sin(this.time.now * 0.0018 + enemy.getData("sway")) * (kind === "boss" ? 0.9 : 1.8);
         if (kind === "boss" && enemy.y > 170) enemy.setVelocityY(8);
@@ -1437,7 +1867,13 @@ class BattleScene extends Phaser.Scene {
         let shootDelay = 1.0;
         let isHoming = (tier === 2);
 
-        if (kind === "boss") {
+        // Heavy ships have a chance to fire Toxic Nuclear Missiles
+        const heavyNukeRoll = (kind === "dreadnought" || kind === "cruiser" || kind === "destroyer" || kind === "boss") && Math.random() < 0.16;
+
+        if (heavyNukeRoll) {
+          shootDelay = 2.2;
+          this.enemyFireNuke(enemy.x, enemy.y + 40);
+        } else if (kind === "boss") {
           if (this.level === 1) {
             shootDelay = 0.22;
             const lanes = [-44, 0, 44];
@@ -1497,7 +1933,6 @@ class BattleScene extends Phaser.Scene {
           shootDelay = tier === 2 ? 1.2 : tier === 1 ? 1.5 : 1.8;
           this.enemyDropBomb(enemy.x, enemy.y + 32);
         } else if (kind === "drone") {
-          // Kamikaze drones do not shoot standard bullets, they just pursue and self-destruct on contact.
           shootDelay = 999.0;
         } else if (kind === "vanguard") {
           shootDelay = tier === 2 ? 0.7 : tier === 1 ? 0.9 : 1.1;
@@ -1516,6 +1951,25 @@ class BattleScene extends Phaser.Scene {
             const angle = startAngle + (i * Math.PI * 2) / count;
             this.enemyFireAngle(enemy.x, enemy.y + 45, angle, 250);
           }
+        } else if (kind === "shield-projector") {
+          shootDelay = 1.4;
+          this.enemyFire(enemy.x, enemy.y + 30, 240, isHoming);
+        } else if (kind === "mine-carrier") {
+          shootDelay = 1.8;
+          this.enemyDropMine(enemy.x, enemy.y + 32);
+        } else if (kind === "beam-cruiser") {
+          const state = enemy.getData("beamState") || "idle";
+          if (state === "idle") {
+            enemy.setData("beamState", "targeting");
+            shootDelay = 1.2; // charging lock duration
+          } else if (state === "targeting") {
+            enemy.setData("beamState", "firing");
+            shootDelay = 2.2; // firing beam duration
+            audio.playSpecial();
+          } else {
+            enemy.setData("beamState", "idle");
+            shootDelay = 2.8; // cooldown
+          }
         } else {
           // scout
           shootDelay = tier === 2 ? 0.8 : tier === 1 ? 1.1 : 1.45;
@@ -1530,11 +1984,23 @@ class BattleScene extends Phaser.Scene {
       return true;
     });
 
-    // Update seeking enemy shots (Homing logic & Bomb explosion)
+    // Update seeking enemy shots (Homing logic & Bomb/Mine explosion)
     this.enemyShots.children.each((child) => {
       const shot = child as Phaser.Physics.Arcade.Image;
       if (!shot.active || !shot.body) return true;
       
+      const isMine = shot.getData("isMine") === true;
+      const isNuke = shot.getData("isNuke") === true;
+
+      if (isMine) {
+        shot.angle += 2; // slow spin
+      } else if (isNuke) {
+        // slight smoke trail
+        if (Math.random() < 0.15) {
+          this.fx.explode(2, shot.x, shot.y);
+        }
+      }
+
       if (shot.getData("isBomb") === true) {
         let timer = shot.getData("timer") - dt;
         shot.setData("timer", timer);
@@ -1574,6 +2040,8 @@ class BattleScene extends Phaser.Scene {
       shot.setData("homing", false);
     }
     shot.setData("isBomb", false);
+    shot.setData("isMine", false);
+    shot.setData("isNuke", false);
     shot.setVelocity(Math.cos(angle) * speed, Math.sin(angle) * speed);
   }
 
@@ -1590,6 +2058,8 @@ class BattleScene extends Phaser.Scene {
       shot.setData("homing", false);
     }
     shot.setData("isBomb", false);
+    shot.setData("isMine", false);
+    shot.setData("isNuke", false);
     shot.setVelocity(Math.cos(angle) * speed, Math.sin(angle) * speed);
   }
 
@@ -1600,7 +2070,28 @@ class BattleScene extends Phaser.Scene {
     bomb.setActive(true).setVisible(true).setDepth(4).setScale(0.8).setBlendMode(Phaser.BlendModes.ADD);
     bomb.clearTint();
     bomb.setVelocity(0, 160);
-    bomb.setData({ isBomb: true, timer: 1.5 });
+    bomb.setData({ isBomb: true, timer: 1.5, isMine: false, isNuke: false });
+  }
+
+  private enemyDropMine(x: number, y: number) {
+    const mine = this.enemyShots.get(x, y, "space-mine") as Phaser.Physics.Arcade.Image;
+    if (!mine) return;
+    mine.enableBody(true, x, y, true, true);
+    mine.setActive(true).setVisible(true).setDepth(4).setScale(1.0);
+    mine.clearTint();
+    mine.setVelocity(Phaser.Math.Between(-60, 60), 80);
+    mine.setData({ isBomb: false, isMine: true, isNuke: false, hp: 30 });
+  }
+
+  private enemyFireNuke(x: number, y: number) {
+    const nuke = this.enemyShots.get(x, y, "enemy-nuke") as Phaser.Physics.Arcade.Image;
+    if (!nuke) return;
+    nuke.enableBody(true, x, y, true, true);
+    nuke.setActive(true).setVisible(true).setDepth(4).setScale(0.85);
+    nuke.clearTint();
+    const angle = Phaser.Math.Angle.Between(x, y, this.player.x, this.player.y);
+    nuke.setVelocity(Math.cos(angle) * 140, Math.sin(angle) * 140);
+    nuke.setData({ isBomb: false, isMine: false, isNuke: true, hp: 50 });
   }
 
   private changeMode(mode: Mode) {
@@ -1649,7 +2140,23 @@ class BattleScene extends Phaser.Scene {
     const projectile = projectileObj as Phaser.Physics.Arcade.Image;
     const enemy = enemyObj as Phaser.Physics.Arcade.Sprite;
     projectile.disableBody(true, true);
-    this.damageEnemy(enemy, projectile.getData("damage") ?? 10, false);
+    
+    const isHyper = projectile.getData("isHyperShell") === true;
+    const dmg = projectile.getData("damage") ?? (isHyper ? 80 : 10);
+    this.damageEnemy(enemy, dmg, isHyper);
+
+    if (isHyper) {
+      // Area of effect splash damage
+      this.fx.explode(22, enemy.x, enemy.y);
+      const radius = 180;
+      this.enemies.children.each((child) => {
+        const other = child as Phaser.Physics.Arcade.Sprite;
+        if (other.active && other !== enemy && Phaser.Math.Distance.Between(enemy.x, enemy.y, other.x, other.y) < radius) {
+          this.damageEnemy(other, Math.round(dmg * 0.55), true);
+        }
+        return true;
+      });
+    }
   };
 
   private hitEnemyWithMissile: Phaser.Types.Physics.Arcade.ArcadePhysicsCallback = (projectileObj, enemyObj) => {
@@ -1659,6 +2166,119 @@ class BattleScene extends Phaser.Scene {
     this.fx.explode(22, projectile.x, projectile.y);
     this.damageEnemy(enemy, projectile.getData("damage") ?? 50, true);
   };
+
+  private hitEnemyShield: Phaser.Types.Physics.Arcade.ArcadePhysicsCallback = (projectileObj, shieldObj) => {
+    const projectile = projectileObj as Phaser.Physics.Arcade.Image;
+    const shield = shieldObj as Phaser.Physics.Arcade.Sprite;
+    projectile.disableBody(true, true);
+    this.fx.explode(8, projectile.x, projectile.y);
+    
+    const dmg = projectile.getData("damage") ?? 10;
+    const hp = shield.getData("hp") - dmg;
+    shield.setData("hp", hp);
+    shield.setTintFill(0xffffff);
+    this.time.delayedCall(45, () => shield.clearTint());
+
+    if (hp <= 0) {
+      this.fx.explode(32, shield.x, shield.y);
+      shield.disableBody(true, true);
+    }
+  };
+
+  private hitEnemyShieldWithLaser: Phaser.Types.Physics.Arcade.ArcadePhysicsCallback = (laserObj, shieldObj) => {
+    const laser = laserObj as Phaser.Physics.Arcade.Sprite;
+    const shield = shieldObj as Phaser.Physics.Arcade.Sprite;
+    const dmg = laser.getData("damage") ?? 2;
+    const hp = shield.getData("hp") - dmg;
+    shield.setData("hp", hp);
+    if (hp <= 0) {
+      this.fx.explode(32, shield.x, shield.y);
+      shield.disableBody(true, true);
+    }
+  };
+
+  private hitEnemyShot: Phaser.Types.Physics.Arcade.ArcadePhysicsCallback = (projectileObj, shotObj) => {
+    const projectile = projectileObj as Phaser.Physics.Arcade.Image;
+    const shot = shotObj as Phaser.Physics.Arcade.Image;
+    
+    const isMine = shot.getData("isMine") === true;
+    const isNuke = shot.getData("isNuke") === true;
+    
+    if (isMine || isNuke) {
+      projectile.disableBody(true, true);
+      this.fx.explode(6, projectile.x, projectile.y);
+      
+      const dmg = projectile.getData("damage") ?? (projectile.getData("isHyperShell") === true ? 80 : 10);
+      const hp = (shot.getData("hp") ?? 10) - dmg;
+      shot.setData("hp", hp);
+      
+      if (hp <= 0) {
+        this.fx.explode(18, shot.x, shot.y);
+        shot.disableBody(true, true);
+        this.score += isNuke ? 150 : 80;
+      }
+    }
+  };
+
+  private hitEnemyShotWithLaser: Phaser.Types.Physics.Arcade.ArcadePhysicsCallback = (laserObj, shotObj) => {
+    const shot = shotObj as Phaser.Physics.Arcade.Image;
+    const laser = laserObj as Phaser.Physics.Arcade.Sprite;
+    const isMine = shot.getData("isMine") === true;
+    const isNuke = shot.getData("isNuke") === true;
+    
+    if (isMine || isNuke) {
+      const dmg = laser.getData("damage") ?? 2;
+      const hp = (shot.getData("hp") ?? 10) - dmg;
+      shot.setData("hp", hp);
+      if (hp <= 0) {
+        this.fx.explode(18, shot.x, shot.y);
+        shot.disableBody(true, true);
+        this.score += isNuke ? 150 : 80;
+      }
+    }
+  };
+
+  private hitAegis: Phaser.Types.Physics.Arcade.ArcadePhysicsCallback = (shotObj, aegisObj) => {
+    const shot = shotObj as Phaser.Physics.Arcade.Image;
+    const orb = aegisObj as Phaser.Physics.Arcade.Sprite;
+    shot.disableBody(true, true);
+    this.fx.explode(6, shot.x, shot.y);
+    
+    orb.setTint(0xffffff);
+    this.time.delayedCall(80, () => { if (orb.active) orb.clearTint(); });
+    audio.playLaser();
+  };
+
+  private launchNuke() {
+    if (this.pausedByOverlay || this.playerState.nukeStock <= 0) return;
+    this.playerState.nukeStock -= 1;
+    this.cameras.main.shake(900, 0.03);
+    this.cameras.main.flash(450, 255, 255, 255, false);
+    audio.playSpecial();
+
+    // Spawn expanding shockwave
+    const blast = this.add.image(W / 2, H / 2, "nuke-blast").setDepth(7).setScale(0.1).setAlpha(0.9);
+    this.tweens.add({
+      targets: blast,
+      scale: 12.0,
+      alpha: 0,
+      duration: 1200,
+      ease: "Quad.easeOut",
+      onComplete: () => blast.destroy()
+    });
+
+    // Clear all enemy projectiles
+    this.enemyShots.clear(true, true);
+
+    // Damage all active enemies
+    this.enemies.children.each((child) => {
+      const enemy = child as Phaser.Physics.Arcade.Sprite;
+      if (enemy.active) {
+        this.damageEnemy(enemy, 420, true);
+      }
+      return true;
+    });
+  }
 
   private damageEnemy(enemy: Phaser.Physics.Arcade.Sprite, damage: number, big: boolean) {
     const hp = enemy.getData("hp") - damage;
@@ -1692,13 +2312,13 @@ class BattleScene extends Phaser.Scene {
   };
 
   private dropPickup(x: number, y: number, force?: PickupKind) {
-    const kinds: PickupKind[] = ["cannon", "missile", "repair", "core", "laser", "swarm"];
+    const kinds: PickupKind[] = ["cannon", "missile", "repair", "core", "laser", "swarm", "nuke", "lightning", "aegis"];
     const kind = force ?? kinds[Phaser.Math.Between(0, kinds.length - 1)];
     const pickup = this.pickups.get(x, y, "pickup") as Phaser.Physics.Arcade.Image;
     if (!pickup) return;
     pickup.enableBody(true, x, y, true, true);
     pickup.setActive(true).setVisible(true).setDepth(5).setData("kind", kind).setVelocity(Phaser.Math.Between(-40, 40), 150);
-    pickup.setTint(kind === "cannon" ? 0x51f6ff : kind === "missile" ? 0xffcb57 : kind === "repair" ? 0x79ff9f : kind === "laser" ? 0xef4444 : kind === "swarm" ? 0xa855f7 : 0xff477e);
+    pickup.setTint(kind === "cannon" ? 0x51f6ff : kind === "missile" ? 0xffcb57 : kind === "repair" ? 0x79ff9f : kind === "laser" ? 0xef4444 : kind === "swarm" ? 0xa855f7 : kind === "nuke" ? 0xfacc15 : kind === "lightning" ? 0x60a5fa : kind === "aegis" ? 0x06b6d4 : 0xff477e);
   }
 
   private collectPickup: Phaser.Types.Physics.Arcade.ArcadePhysicsCallback = (_playerObj, pickupObj) => {
@@ -1709,12 +2329,18 @@ class BattleScene extends Phaser.Scene {
     if (kind === "missile") this.playerState.missileLevel = clamp(this.playerState.missileLevel + 1, 1, 5);
     if (kind === "laser") this.playerState.laserLevel = clamp(this.playerState.laserLevel + 1, 0, 5);
     if (kind === "swarm") this.playerState.swarmLevel = clamp(this.playerState.swarmLevel + 1, 0, 5);
+    if (kind === "lightning") this.playerState.lightningLevel = clamp(this.playerState.lightningLevel + 1, 0, 5);
+    if (kind === "aegis") this.playerState.aegisLevel = clamp(this.playerState.aegisLevel + 1, 0, 5);
+    if (kind === "nuke") this.playerState.nukeStock = clamp(this.playerState.nukeStock + 1, 0, 3);
     if (kind === "repair") this.playerState.hp = clamp(this.playerState.hp + 32, 0, this.playerState.hpMax);
     if (kind === "core") {
       this.playerState.cannonLevel = clamp(this.playerState.cannonLevel + 1, 1, 5);
       this.playerState.missileLevel = clamp(this.playerState.missileLevel + 1, 1, 5);
       this.playerState.laserLevel = clamp(this.playerState.laserLevel + 1, 0, 5);
       this.playerState.swarmLevel = clamp(this.playerState.swarmLevel + 1, 0, 5);
+      this.playerState.lightningLevel = clamp(this.playerState.lightningLevel + 1, 0, 5);
+      this.playerState.aegisLevel = clamp(this.playerState.aegisLevel + 1, 0, 5);
+      this.playerState.nukeStock = clamp(this.playerState.nukeStock + 1, 0, 3);
       this.playerState.special = 100;
     }
     this.fx.explode(18, pickup.x, pickup.y);
@@ -1729,8 +2355,12 @@ class BattleScene extends Phaser.Scene {
 
   private shotPlayer: Phaser.Types.Physics.Arcade.ArcadePhysicsCallback = (_playerObj, shotObj) => {
     const shot = shotObj as Phaser.Physics.Arcade.Image;
+    const isMine = shot.getData("isMine") === true;
+    const isNuke = shot.getData("isNuke") === true;
     shot.disableBody(true, true);
-    this.damagePlayer(14);
+    
+    const damage = isNuke ? 48 : isMine ? 34 : 14;
+    this.damagePlayer(damage);
   };
 
   private damagePlayer(damage: number) {

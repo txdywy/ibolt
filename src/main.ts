@@ -2702,7 +2702,7 @@ class BattleScene extends Phaser.Scene {
     [this.bullets, this.missiles, this.enemyShots, this.pickups, this.enemies, this.medalsGroup].forEach((group) => {
       group.children.each((child) => {
         const obj = child as Phaser.Physics.Arcade.Image;
-        if (obj.active && (obj.y < -64 || obj.y > H + 64 || obj.x < -64 || obj.x > W + 64)) {
+        if (obj.active && (obj.y < -150 || obj.y > H + 64 || obj.x < -64 || obj.x > W + 64)) {
           obj.disableBody(true, true);
         }
         return true;
